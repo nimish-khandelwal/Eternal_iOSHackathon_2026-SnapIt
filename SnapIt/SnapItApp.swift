@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct SnapItApp: App {
+    @State private var appState = AppState()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomeView()
+                .environment(appState)
         }
     }
 }
