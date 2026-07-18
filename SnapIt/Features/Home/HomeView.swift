@@ -17,6 +17,8 @@ struct HomeView: View {
             ZStack(alignment: .bottom) {
                 if selectedBottomTab == 4 {
                     CartView()
+                } else if selectedBottomTab == 1 {
+                    SubscriptionsListView()
                 } else {
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 0) {
@@ -275,7 +277,7 @@ struct HomeView: View {
 
     private static let bottomTabs: [(defaultImageName: String, selectedImageName: String, title: String)] = [
         ("HomeDefault", "HomeSelected", "Home"),
-        ("CategoryDefault", "CategorySelected", "Category"),
+        ("SubsDefault", "SubsSelected", "Subs"),
         ("ScanDefault", "ScanSelected", "Capture"),
         ("PrintDefault", "PrintSelected", "Print"),
         ("BasketDefault", "BasketSelected", "Cart")
@@ -362,7 +364,7 @@ struct HomeView: View {
                 FeatureActionRow(
                     icon: "barcode.viewfinder",
                     title: "Snap Product",
-                    subtitle: "Point at one item and add it instantly"
+                    subtitle: "Reads the label, or recognizes loose items like pulses"
                 ) {
                     open(.snapProduct)
                 }
@@ -370,7 +372,7 @@ struct HomeView: View {
                 FeatureActionRow(
                     icon: "list.clipboard",
                     title: "Shopping List",
-                    subtitle: "Scan a handwritten list or receipt"
+                    subtitle: "Text-only scan of a handwritten list or receipt"
                 ) {
                     open(.shoppingList)
                 }
@@ -378,7 +380,7 @@ struct HomeView: View {
                 FeatureActionRow(
                     icon: "refrigerator",
                     title: "Pantry Scan",
-                    subtitle: "Find likely refills from fridge or shelf"
+                    subtitle: "Reads labels and recognizes produce to spot refills"
                 ) {
                     open(.pantryScan)
                 }

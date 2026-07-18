@@ -8,6 +8,9 @@ final class SnapProductViewModel {
     var phase: ScanPhase = .capture
     var capturedImage: UIImage?
     var detectedProduct: DetectedProduct?
+    /// Populated only when the match is missing or under-confident — drives
+    /// the manual "pick the actual product" picker under the result.
+    var candidateProducts: [Product] = []
 
     init(visionService: VisionService, catalogService: CatalogService) {
         self.visionService = visionService
@@ -25,8 +28,15 @@ final class SnapProductViewModel {
                 phase = .error("Couldn't recognize that product. Try moving closer or improving lighting.")
                 return
             }
-            first.matchedProduct = ProductMatcher(catalog: catalog).match(first)
+            let matcher = ProductMatcher(catalog: catalog)
+            first.matchedProduct = matcher.match(first)
             detectedProduct = first
+
+            if first.matchedProduct == nil || first.confidence < ProductMatcher.lowConfidenceThreshold {
+                candidateProducts = matcher.candidates(for: first)
+            } else {
+                candidateProducts = []
+            }
             phase = .results
         } catch {
             phase = .error(error.localizedDescription)
@@ -37,5 +47,6 @@ final class SnapProductViewModel {
         phase = .capture
         capturedImage = nil
         detectedProduct = nil
+        candidateProducts = []
     }
 }

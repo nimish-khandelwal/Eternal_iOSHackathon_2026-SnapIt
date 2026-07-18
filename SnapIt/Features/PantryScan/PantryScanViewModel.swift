@@ -2,6 +2,14 @@ import UIKit
 
 @Observable
 final class PantryScanViewModel {
+    /// A detection the vision model wasn't confident about, or couldn't map
+    /// to any catalog SKU at all — paired with a manual-pick shortlist.
+    struct UncertainDetection: Identifiable {
+        let id: UUID
+        let detected: DetectedProduct
+        let candidates: [Product]
+    }
+
     private let visionService: VisionService
     private let catalogService: CatalogService
     private let purchaseHistoryService: PurchaseHistoryService
@@ -9,6 +17,7 @@ final class PantryScanViewModel {
     var phase: ScanPhase = .capture
     var capturedImage: UIImage?
     var results: [PantryComparisonResult] = []
+    var uncertainDetections: [UncertainDetection] = []
 
     init(visionService: VisionService, catalogService: CatalogService, purchaseHistoryService: PurchaseHistoryService) {
         self.visionService = visionService
@@ -19,6 +28,17 @@ final class PantryScanViewModel {
     var likelyRunningLow: [PantryComparisonResult] { results.filter { $0.status == .likelyRunningLow } }
     var stillAvailable: [PantryComparisonResult] { results.filter { $0.status == .stillAvailable } }
     var notDetected: [PantryComparisonResult] { results.filter { $0.status == .notDetected } }
+
+    /// Unmatched detections — nothing in the catalog was even a loose fit.
+    var unrecognizedDetections: [UncertainDetection] {
+        uncertainDetections.filter { $0.detected.matchedProduct == nil }
+    }
+
+    /// Candidates for a "Still Available" row whose match was under-confident,
+    /// so the row can offer a "not quite right?" picker beneath it.
+    func candidates(forMatchedProductID productID: String) -> [Product]? {
+        uncertainDetections.first { $0.detected.matchedProduct?.id == productID }?.candidates
+    }
 
     func analyze(image: UIImage) async {
         capturedImage = image
@@ -37,6 +57,10 @@ final class PantryScanViewModel {
                 return copy
             }
 
+            uncertainDetections = enrichedDetected
+                .filter { $0.matchedProduct == nil || $0.confidence < ProductMatcher.lowConfidenceThreshold }
+                .map { UncertainDetection(id: $0.id, detected: $0, candidates: matcher.candidates(for: $0)) }
+
             results = ComparisonEngine().compare(frequent: history, detected: enrichedDetected, today: Date())
             phase = .results
         } catch {
@@ -48,5 +72,6 @@ final class PantryScanViewModel {
         phase = .capture
         capturedImage = nil
         results = []
+        uncertainDetections = []
     }
 }

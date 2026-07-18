@@ -7,8 +7,9 @@ final class AppState {
     let purchaseHistoryService: PurchaseHistoryService
     let cartStore: CartStore
     let localOrders = LocalOrderHistoryStore()
+    let subscriptionStore: SubscriptionStore
 
-    init(cartStore: CartStore = CartStore()) {
+    init(cartStore: CartStore = CartStore(), subscriptionStore: SubscriptionStore = SubscriptionStore()) {
         // Swap point: flip to OpenAIVisionService() or GeminiVisionService()
         // once a real key is set in Core/Networking/Secrets.swift.
         self.visionService = GeminiVisionService()
@@ -16,5 +17,6 @@ final class AppState {
         self.catalogService = catalog
         self.purchaseHistoryService = catalog
         self.cartStore = cartStore
+        self.subscriptionStore = subscriptionStore
     }
 }

@@ -3,11 +3,10 @@ import SwiftUI
 /// Masks the 1-4s vision API call as perceived progress rather than dead time.
 struct ScanningOverlay: View {
     let image: UIImage
+    var captions: [String] = ["Reading labels…", "Recognizing products…"]
 
     @State private var captionIndex = 0
     @State private var shimmerUp = false
-
-    private let captions = ["Reading labels…", "Checking your usuals…", "Comparing to last week…"]
 
     var body: some View {
         ZStack {

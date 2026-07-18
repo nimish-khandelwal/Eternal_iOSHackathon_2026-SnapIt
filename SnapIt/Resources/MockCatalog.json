@@ -109998,5 +109998,76 @@
     "reviews": 4263,
     "vegetarian": true,
     "emoji": "🍎"
-  }
+  },
+  {
+    "id": "tata-copper-water-0001",
+    "sku": "SKU005001",
+    "brand": "Tata",
+    "name": "Tata Copper Water",
+    "synonyms": [
+      "water",
+      "mineral water",
+      "tata water",
+      "tata"
+    ],
+    "category": "Beverages",
+    "price": 19.00,
+    "mrp": 20.00,
+    "discount": 1.00,
+    "unit": "1 L",
+    "stock": 390,
+    "rating": 4.3,
+    "reviews": 403,
+    "vegetarian": true,
+    "emoji": "💧"
+  },
+  {
+    "id": "coca-cola-softdrink-0023",
+    "sku": "SKU005002",
+    "brand": "Coca Cola",
+    "name": "Coca Cola Original Can",
+    "synonyms": [
+      "coca-cola",
+      "coca cola",
+      "cocacola",
+      "cola",
+      "cold drink",
+      "soft drink",
+      "coca cola can",
+      "coca cola drink"
+    ],
+    "category": "Beverages",
+    "price": 38.00,
+    "mrp": 40.00,
+    "discount": 2.00,
+    "unit": "300 ml",
+    "stock": 390,
+    "rating": 4.3,
+    "reviews": 403,
+    "vegetarian": true,
+    "emoji": "💧"
+  },
+  {
+    "id": "Red-Bull-Energy-Drink-0023",
+    "sku": "SKU005002",
+    "brand": "Red Bull",
+    "name": "Red Bull Energy Drink",
+    "synonyms": [
+      "Red Bull",
+      "energy drink",
+      "red bull energy drink",
+      "red bull",
+      "redbull"
+    ],
+    "category": "Beverages",
+    "price": 120.00,
+    "mrp": 125.00,
+    "discount": 5.00,
+    "unit": "250 ml",
+    "stock": 390,
+    "rating": 4.8,
+    "reviews": 403,
+    "vegetarian": true,
+    "emoji": "⚡️"
+  },
 ]
