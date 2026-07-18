@@ -14,20 +14,24 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottom) {
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 0) {
-                        header
-                        grocerySection
-                        snacksSection
-                        breakfastSection
+                if selectedBottomTab == 4 {
+                    CartView()
+                } else {
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: 0) {
+                            header
+                            grocerySection
+                            snacksSection
+                            breakfastSection
+                        }
+                        .padding(.bottom, 112)
                     }
-                    .padding(.bottom, 112)
-                }
-                .background(Color.white)
-                .ignoresSafeArea(edges: .top)
-                .scrollDismissesKeyboard(.immediately)
-                .onTapGesture {
-                    isSearchFocused = false
+                    .background(Color.white)
+                    .ignoresSafeArea(edges: .top)
+                    .scrollDismissesKeyboard(.immediately)
+                    .onTapGesture {
+                        isSearchFocused = false
+                    }
                 }
 
                 floatingNavigation
@@ -136,7 +140,7 @@ struct HomeView: View {
 
             Spacer(minLength: 0)
 
-            HStack(alignment: .top, spacing: 12) {
+            HStack(alignment: .top, spacing: 16) {
                 WalletButton(count: appState.cartStore.totalCount)
 
                 Image(systemName: "person.circle.fill")
@@ -287,12 +291,12 @@ struct HomeView: View {
                             if index == 2 {
                                 selectedBottomTab = index
                                 isShowingFeaturePicker = true
-                            }else {
+                            } else {
                                 selectedBottomTab = index
                                 lastSelecteBottomTab = index
                                 isShowingFeaturePicker = false
                             }
-                           
+
                         }
                     }
                 }
@@ -404,13 +408,27 @@ private enum LensFeature: String, Identifiable {
 
 private struct WalletButton: View {
     let count: Int
+    var action: () -> Void = {}
 
     var body: some View {
-        Image(systemName: "wallet.bifold.fill")
-            .resizable()
-            .scaledToFit()
-            .frame(width: 28, height: 28)
-            .foregroundStyle(Color.blinkitInk)
+        Button(action: action) {
+            Image(systemName: "wallet.bifold.fill")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 28, height: 28)
+                .foregroundStyle(Color.blinkitInk)
+                .overlay(alignment: .topTrailing) {
+                    if count > 0 {
+                        Text("\(count)")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(.white)
+                            .padding(4)
+                            .background(Color(red: 0.86, green: 0.14, blue: 0.19), in: Circle())
+                            .offset(x: 10, y: -8)
+                    }
+                }
+        }
+        .buttonStyle(PressScaleButtonStyle())
     }
 }
 

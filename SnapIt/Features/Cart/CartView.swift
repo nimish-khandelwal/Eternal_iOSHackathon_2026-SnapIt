@@ -15,16 +15,37 @@ struct CartView: View {
             } else {
                 ScrollView {
                     LazyVStack(spacing: 16) {
-
+                        
                         // MARK: - Cart Products
                         VStack(spacing: 0) {
-
+                            
+                                HStack(spacing: 2) {
+                                    Image(systemName: "clock.circle")
+                                        .foregroundStyle(.green)
+                                        .scaledToFill()
+                                        .imageScale(.large)
+                                        .frame(width: 50, height: 50)
+                                    
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        
+                                        Text("\((appState.cartStore.totalPrice < 200) ? "" : "Free ")Delivery in 15 mins")
+                                            .font(.headline)
+                                        
+                                        Text("Shipment of \(appState.cartStore.items.count) items")
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    
+                                    Spacer()
+                                }
+                                .padding(.top, 12)
+                            
                             ForEach(appState.cartStore.items) { item in
                                 
                                 ProductRow(product: item.product) {
                                     QuantityControl(item: item)
                                 }
-
+                                
                                 if item.id != appState.cartStore.items.last?.id {
                                     Divider()
                                         .padding(.leading, 94)
@@ -37,23 +58,23 @@ struct CartView: View {
                             RoundedRectangle(cornerRadius: 18)
                                 .stroke(.gray.opacity(0.08))
                         }
-
+                        
                         // MARK: - Bill Details
-
+                        
                         BillDetailsCard(
                             subtotal: appState.cartStore.totalPrice,
                             discount: 50,
                             delivery: appState.cartStore.totalPrice < 200 ? 20 : 0,
                             handling: 12
                         )
-
+                        
                         // MARK: - Cancellation Policy
-
+                        
                         VStack(alignment: .leading, spacing: 10) {
-
+                            
                             Text("Cancellation Policy")
                                 .font(.headline)
-
+                            
                             Text("Once your order is placed, cancellation may result in a fee. In case of unexpected delays leading to order cancellation, a complete refund will be provided.")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
@@ -62,46 +83,45 @@ struct CartView: View {
                         .padding()
                         .background(Color(.systemBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 18))
+                        
+                        
+                        VStack(spacing: 12) {
+                            HStack {
+                                
+                                Text("Grand Total")
+                                    .font(.system(size: 16, weight: .bold))
+                                
+                                Spacer()
+                                
+                                Text("₹\(Int(appState.cartStore.totalPrice - 50 + 2))")
+                                    .font(.system(size: 18, weight: .bold))
+                            }
+                            
+                            Button {
+                                
+                                showCheckoutAlert = true
+                                
+                            } label: {
+                                
+                                Text("Add payment method")
+                                    .font(.system(size: 18, weight: .semibold))
+                                    .foregroundStyle(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 52)
+                                    .background(Color.green)
+                                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                            }
+                            
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 12)
+                        .padding(.bottom, 8)
+                        .clipShape(RoundedRectangle(cornerRadius: 18))
+                        .background(.white)
                     }
                     .padding()
                 }
                 .background(Color(.systemGroupedBackground))
-                .safeAreaInset(edge: .bottom) {
-
-                    VStack(spacing: 12) {
-
-                        HStack {
-
-                            Text("Grand Total")
-                                .font(.system(size: 16, weight: .bold))
-
-                            Spacer()
-
-                            Text("₹\(Int(appState.cartStore.totalPrice - 50 + 2))")
-                                .font(.system(size: 18, weight: .bold))
-                        }
-
-                        Button {
-
-                            showCheckoutAlert = true
-
-                        } label: {
-
-                            Text("Add payment method")
-                                .font(.system(size: 18, weight: .semibold))
-                                .foregroundStyle(.white)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 52)
-                                .background(Color.green)
-                                .clipShape(RoundedRectangle(cornerRadius: 16))
-                        }
-
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 12)
-                    .padding(.bottom, 8)
-                    .background(.white)
-                }
             }
         }
         .navigationTitle("Checkout")
