@@ -6,6 +6,7 @@ struct HomeView: View {
     @State private var selectedFeature: LensFeature?
     @State private var selectedHeaderTab = 0
     @State private var selectedBottomTab = 0
+    @State private var lastSelecteBottomTab = 0
     @State private var searchText = ""
     @State private var speech = SpeechRecognizer()
     @FocusState private var isSearchFocused: Bool
@@ -46,7 +47,7 @@ struct HomeView: View {
                     PantryScanView()
                 }
             }
-        }
+        }.dynamicTypeSize(.medium)
     }
 
     private var header: some View {
@@ -56,7 +57,7 @@ struct HomeView: View {
                 searchBar
             }
             .padding(.horizontal, 12)
-            .padding(.top, 74)
+            .padding(.top, 50)
 
             categoryTabs
                 .padding(.top, 22)
@@ -66,12 +67,12 @@ struct HomeView: View {
             ZStack {
                 LinearGradient(
                     colors: [
-                        Color(red: 0.98, green: 0.70, blue: 0.84),
-                        Color(red: 0.99, green: 0.82, blue: 0.79),
-                        Color(red: 0.96, green: 0.86, blue: 0.86)
+                        Color(red: 1, green: 1, blue: 1), // #ffe142
+                        Color(red: 1, green: 0.882, blue: 0.259),
+                        Color(red: 1, green: 0.882, blue: 0.259) // #ffe142
                     ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
+                    startPoint: .top,
+                    endPoint: .bottom
                 )
 
                 SunburstShape()
@@ -91,24 +92,24 @@ struct HomeView: View {
         HStack(alignment: .top, spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Blinkit in")
-                    .font(.system(size: 16, weight: .black, design: .rounded))
+                    .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(Color.blinkitInk)
 
                 HStack(alignment: .center, spacing: 7) {
                     Text("8 minutes")
-                        .font(.system(size: 32, weight: .black, design: .rounded))
+                        .font(.system(size: 28, weight: .heavy))
                         .foregroundStyle(Color.blinkitInk)
                         .lineLimit(1)
                         .minimumScaleFactor(0.92)
                         .layoutPriority(2)
 
                     HStack(spacing: 5) {
-                        Image("BlinkitLocationStore")
+                        Image(systemName: "storefront")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 16, height: 16)
+                            .frame(width: 10, height: 10)
                         Text("650 m away")
-                            .font(.system(size: 13, weight: .black, design: .rounded))
+                            .font(.system(size: 12, weight: .bold))
                     }
                     .foregroundStyle(Color(red: 0.00, green: 0.48, blue: 0.50))
                     .padding(.horizontal, 8)
@@ -119,14 +120,14 @@ struct HomeView: View {
                 }
 
                 HStack(spacing: 4) {
-                    Text("NH2 STAYS PG...")
-                        .font(.system(size: 18, weight: .black, design: .rounded))
-                    Text("- NH2 Stays PG")
-                        .font(.system(size: 18, weight: .medium, design: .rounded))
-                    Image("BlinkitChevron")
+                    Text("Zomato Farm")
+                        .font(.system(size: 12, weight: .bold))
+                    Text("- Chhatarpur far...")
+                        .font(.system(size: 12))
+                    Image(systemName: "arrowtriangle.down.fill")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 15, height: 13)
+                        .frame(width: 6, height: 6)
                 }
                 .foregroundStyle(Color.blinkitInk)
                 .lineLimit(1)
@@ -135,13 +136,14 @@ struct HomeView: View {
 
             Spacer(minLength: 0)
 
-            HStack(alignment: .top, spacing: 7) {
+            HStack(alignment: .top, spacing: 12) {
                 WalletButton(count: appState.cartStore.totalCount)
 
-                Image("BlinkitProfile")
+                Image(systemName: "person.circle.fill")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 44, height: 44)
+                    .frame(width: 28, height: 28)
+                    .foregroundStyle(Color.blinkitInk)
             }
             .padding(.top, 14)
         }
@@ -150,17 +152,17 @@ struct HomeView: View {
     private var searchBar: some View {
         HStack(spacing: 13) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 22, weight: .semibold))
+                .font(.system(size: 19, weight: .medium))
                 .foregroundStyle(Color.blinkitInk)
 
             TextField(
                 "",
                 text: $searchText,
                 prompt: Text("Search \"birthday gift\"")
-                    .font(.system(size: 22, weight: .semibold, design: .rounded))
+                    .font(.system(size: 16, weight: .medium))
                     .foregroundStyle(.black.opacity(0.9))
             )
-            .font(.system(size: 22, weight: .semibold, design: .rounded))
+            .font(.system(size: 16, weight: .medium))
             .foregroundStyle(.black)
             .focused($isSearchFocused)
             .submitLabel(.search)
@@ -185,15 +187,15 @@ struct HomeView: View {
                 speech.toggle()
             } label: {
                 Image(systemName: "mic.fill")
-                    .font(.system(size: 22, weight: .semibold))
+                    .font(.system(size: 20))
                     .foregroundStyle(speech.isRecording ? .red : Color.blinkitInk)
                     .symbolEffect(.pulse, isActive: speech.isRecording)
             }
             .buttonStyle(.plain)
             .padding(.leading, 2)
         }
-        .padding(.horizontal, 16)
-        .frame(height: 55)
+        .padding(.horizontal, 14)
+        .frame(height: 50)
         .background(Color.white.opacity(0.78), in: Capsule())
         .overlay(Capsule().stroke(.white.opacity(0.82), lineWidth: 1))
         .contentShape(Capsule())
@@ -210,7 +212,7 @@ struct HomeView: View {
         ("BlinkitTabAll", "All", false),
         ("BlinkitTabMonsoon", "Monsoon", false),
         ("BlinkitTabElectronics", "Electronics", false),
-        ("BlinkitTabBeauty", "Beauty", true),
+        ("BlinkitTabBeauty", "Beauty", false),
         ("BlinkitTabPharmacy", "Pharmacy", false)
     ]
 
@@ -263,35 +265,46 @@ struct HomeView: View {
         ])
     }
 
-    private static let bottomTabs: [(imageName: String, title: String)] = [
-        ("BlinkitBottomHome", "Home"),
-        ("BlinkitBottomOrder", "Order Again"),
-        ("BlinkitBottomCategories", "Categories"),
-        ("BlinkitBottomPrint", "Print")
+    private static let bottomTabs: [(defaultImageName: String, selectedImageName: String, title: String)] = [
+        ("HomeDefault", "HomeSelected", "Home"),
+        ("CategoryDefault", "CategorySelected", "Category"),
+        ("ScanDefault", "ScanSelected", "Capture"),
+        ("PrintDefault", "PrintSelected", "Print"),
+        ("BasketDefault", "BasketSelected", "Cart")
     ]
 
     private var floatingNavigation: some View {
-        HStack(spacing: 0) {
-            ForEach(Array(Self.bottomTabs.enumerated()), id: \.offset) { index, tab in
-                FloatingTab(
-                    imageName: tab.imageName,
-                    title: tab.title,
-                    selected: selectedBottomTab == index
-                ) {
-                    withAnimation(.spring(response: 0.28, dampingFraction: 0.86)) {
-                        selectedBottomTab = index
+        HStack{
+            HStack(spacing: 0) {
+                ForEach(Array(Self.bottomTabs.enumerated()), id: \.offset) { index, tab in
+                    FloatingTab(
+                        defaultimageName: tab.defaultImageName,
+                        selectedImageName: tab.selectedImageName,
+                        title: tab.title,
+                        selected: selectedBottomTab == index
+                    ) {
+                        withAnimation(.spring(response: 0.28, dampingFraction: 0.86)) {
+                            if index == 2 {
+                                selectedBottomTab = index
+                                isShowingFeaturePicker = true
+                            }else {
+                                selectedBottomTab = index
+                                lastSelecteBottomTab = index
+                                isShowingFeaturePicker = false
+                            }
+                           
+                        }
                     }
                 }
             }
-            cameraTab
+            .frame(maxWidth: .infinity)
+            .frame(height: 72)
+            .padding(.horizontal, 9)
+            .background(.ultraThinMaterial, in: Capsule())
+            .shadow(color: .black.opacity(0.12), radius: 12, y: 4)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 8)
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: 82)
-        .padding(.horizontal, 9)
-        .background(.ultraThinMaterial, in: Capsule())
-        .shadow(color: .black.opacity(0.14), radius: 18, y: 7)
-        .padding(.horizontal, 20)
-        .padding(.bottom, 8)
     }
 
     private var cameraTab: some View {
@@ -300,14 +313,16 @@ struct HomeView: View {
                 isShowingFeaturePicker = true
             }
         } label: {
-            Image("BlinkitCameraButton")
+            Image(systemName: "camera")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 58, height: 58)
-                .clipShape(Circle())
+                .frame(width: 32, height: 32)
+                
         }
-        .frame(maxWidth: .infinity)
+        .frame(width: 52, height: 52)
         .buttonStyle(.plain)
+        .background(.yellow, in: RoundedRectangle(cornerRadius: 28))
+        
     }
 
     private var featurePickerOverlay: some View {
@@ -317,6 +332,7 @@ struct HomeView: View {
                 .onTapGesture {
                     withAnimation(.easeOut(duration: 0.18)) {
                         isShowingFeaturePicker = false
+                        selectedBottomTab = lastSelecteBottomTab
                     }
                 }
 
@@ -328,9 +344,9 @@ struct HomeView: View {
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Blinkit Lens")
-                        .font(.system(size: 24, weight: .black, design: .rounded))
+                        .font(.system(size: 24, weight: .black ))
                     Text("Choose what you want to scan")
-                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                        .font(.system(size: 14, weight: .medium ))
                         .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -362,7 +378,7 @@ struct HomeView: View {
             .padding(18)
             .padding(.bottom, 20)
             .background(.white, in: RoundedRectangle(cornerRadius: 28))
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 14)
             .padding(.bottom, 18)
             .transition(.move(edge: .bottom).combined(with: .opacity))
         }
@@ -372,6 +388,7 @@ struct HomeView: View {
     private func open(_ feature: LensFeature) {
         withAnimation(.easeOut(duration: 0.18)) {
             isShowingFeaturePicker = false
+            selectedBottomTab = lastSelecteBottomTab
         }
         selectedFeature = feature
     }
@@ -389,10 +406,11 @@ private struct WalletButton: View {
     let count: Int
 
     var body: some View {
-        Image("BlinkitWallet")
+        Image(systemName: "wallet.bifold.fill")
             .resizable()
             .scaledToFit()
-            .frame(width: 47, height: 49)
+            .frame(width: 28, height: 28)
+            .foregroundStyle(Color.blinkitInk)
     }
 }
 
@@ -416,11 +434,11 @@ private struct HeaderCategory: View {
             Image(imageName)
                 .resizable()
                 .scaledToFit()
-                .frame(height: 25)
+                .frame(height: 20)
                 .overlay(alignment: .topTrailing) {
                     if showsSaleBadge {
                         Text("Sale")
-                            .font(.system(size: 10, weight: .heavy, design: .rounded))
+                            .font(.system(size: 10, weight: .heavy ))
                             .foregroundStyle(.white)
                             .padding(.horizontal, 7)
                             .padding(.vertical, 2.5)
@@ -431,7 +449,7 @@ private struct HeaderCategory: View {
 
             VStack(spacing: 4) {
                 Text(title)
-                    .font(.system(size: 13, weight: selected ? .heavy : .medium, design: .rounded))
+                    .font(.system(size: 13, weight: selected ? .bold : .medium))
                     .foregroundStyle(Color.blinkitInk)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
@@ -450,16 +468,16 @@ private struct CategorySection: View {
     let title: String
     let items: [StoreCategory]
 
-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 4)
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 4)
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text(title)
-                .font(.system(size: 20, weight: .black, design: .rounded))
+                .font(.system(size: 20, weight: .bold))
                 .foregroundStyle(Color.blinkitInk)
                 .padding(.horizontal, 12)
 
-            LazyVGrid(columns: columns, alignment: .center, spacing: 16) {
+            LazyVGrid(columns: columns, alignment: .center, spacing: 12) {
                 ForEach(items) { item in
                     CategoryTile(item: item)
                 }
@@ -490,14 +508,14 @@ private struct CategoryTile: View {
     }
 
     private var content: some View {
-        VStack(spacing: 7) {
+        VStack(spacing: 4) {
             Image(item.imageName)
                 .resizable()
-                .aspectRatio(216.0 / 236.0, contentMode: .fit)
-                .frame(maxWidth: .infinity)
+                .scaledToFit()
+                .frame(width: 74, height: 74)
 
             Text(item.title)
-                .font(.system(size: 15, weight: .bold, design: .rounded))
+                .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(Color.blinkitInk)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
@@ -508,7 +526,8 @@ private struct CategoryTile: View {
 }
 
 private struct FloatingTab: View {
-    let imageName: String
+    let defaultimageName: String
+    let selectedImageName: String
     let title: String
     let selected: Bool
     var action: () -> Void = {}
@@ -523,22 +542,14 @@ private struct FloatingTab: View {
 
     private var content: some View {
         ZStack {
-            if selected {
-                Circle()
-                    .fill(.white.opacity(0.72))
-                    .frame(width: 58, height: 58)
-                    .blur(radius: 1)
-                    .shadow(color: .black.opacity(0.08), radius: 8, y: 3)
-            }
-
-            VStack(spacing: 4) {
-                Image(imageName)
+            VStack(spacing: 6) {
+                Image(selected ? selectedImageName : defaultimageName)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: selected ? 34 : 33, height: selected ? 34 : 33)
+                    .frame(width: selected ? 24 : 22, height: selected ? 24 : 22)
 
                 Text(title)
-                    .font(.system(size: selected ? 13 : 12.5, weight: selected ? .black : .medium, design: .rounded))
+                    .font(.system(size: 11, weight: selected ? .bold : .medium))
                     .foregroundStyle(.black)
                     .lineLimit(1)
                     .minimumScaleFactor(0.72)
@@ -546,6 +557,9 @@ private struct FloatingTab: View {
             .padding(.top, selected ? 4 : 2)
         }
         .frame(maxWidth: .infinity)
+        .padding(.top, 4)
+        .padding(.bottom, 4)
+        .background(selected ? .black.opacity(0.08) : .clear)
     }
 }
 
@@ -566,10 +580,10 @@ private struct FeatureActionRow: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.system(size: 18, weight: .black, design: .rounded))
+                        .font(.system(size: 18, weight: .black ))
                         .foregroundStyle(.black)
                     Text(subtitle)
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .font(.system(size: 13, weight: .medium ))
                         .foregroundStyle(.secondary)
                 }
 

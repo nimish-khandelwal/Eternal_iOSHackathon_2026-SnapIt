@@ -2,7 +2,7 @@ import Foundation
 
 @Observable
 final class CartStore {
-    private(set) var items: [CartItem] = []
+     var items: [CartItem] = []
 
     var totalCount: Int { items.reduce(0) { $0 + $1.quantity } }
     var totalPrice: Double { items.reduce(0) { $0 + $1.product.price * Double($1.quantity) } }
