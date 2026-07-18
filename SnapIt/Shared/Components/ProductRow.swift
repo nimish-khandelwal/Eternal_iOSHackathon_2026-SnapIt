@@ -34,14 +34,9 @@ struct ProductRow<Trailing: View>: View {
                     .font(.system(size: 16, weight: .semibold))
                     .lineLimit(2)
 
-//                Text(subtitle ?? "Quantity: \(product.unit)")
-//                    .font(.system(size: 13))
-//                    .foregroundStyle(.secondary)
-
-                Text("Move to wishlist")
+                Text(subtitle ?? "Quantity: \(product.unit)")
                     .font(.system(size: 13))
                     .foregroundStyle(.secondary)
-                    .underline()
             }
 
             Spacer()

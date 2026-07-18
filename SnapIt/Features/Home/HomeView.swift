@@ -17,6 +17,8 @@ struct HomeView: View {
             ZStack(alignment: .bottom) {
                 if selectedBottomTab == 4 {
                     CartView()
+                } else if selectedBottomTab == 1 {
+                    SubscriptionsListView()
                 } else {
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 0) {
@@ -275,7 +277,7 @@ struct HomeView: View {
 
     private static let bottomTabs: [(defaultImageName: String, selectedImageName: String, title: String)] = [
         ("HomeDefault", "HomeSelected", "Home"),
-        ("CategoryDefault", "CategorySelected", "Category"),
+        ("SubsDefault", "SubsSelected", "Subs"),
         ("ScanDefault", "ScanSelected", "Capture"),
         ("PrintDefault", "PrintSelected", "Print"),
         ("BasketDefault", "BasketSelected", "Cart")
