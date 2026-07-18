@@ -128,9 +128,12 @@ private struct SubscriptionRow: View {
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
-                Spacer(minLength: 40)
+                Spacer(minLength: 12)
                 SubscriptionStatusPill(status: subscription.status)
             }
+            // Reserves room for the topTrailing "⋯" overlay so the pill
+            // never sits underneath its tap target.
+            .padding(.trailing, subscription.canManage ? 32 : 0)
 
             HStack(spacing: 6) {
                 ForEach(subscription.items.prefix(4)) { item in

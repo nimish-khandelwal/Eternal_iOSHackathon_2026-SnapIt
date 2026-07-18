@@ -48,18 +48,15 @@ struct ShoppingListScanView: View {
             }
             .background(Color(.systemGroupedBackground))
 
-            Button {
+            AddToCartButton(
+                title: "Add All (\(viewModel?.selectedProducts.count ?? 0))",
+                systemImage: "cart.badge.plus",
+                isDisabled: (viewModel?.selectedProducts.isEmpty) ?? true
+            ) {
                 if let viewModel {
                     appState.cartStore.add(viewModel.selectedProducts)
                 }
-            } label: {
-                Label("Add All (\(viewModel?.selectedProducts.count ?? 0))", systemImage: "cart.badge.plus")
-                    .font(.system(size: 18, weight: .semibold))
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 52)
             }
-            .buttonStyle(.borderedProminent)
-            .disabled((viewModel?.selectedProducts.isEmpty) ?? true)
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .background(.white)

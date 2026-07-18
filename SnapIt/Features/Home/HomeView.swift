@@ -57,6 +57,17 @@ struct HomeView: View {
                     PantryScanView()
                 }
             }
+            .onChange(of: appState.requestedTabAfterAction) { _, requestedTab in
+                guard let requestedTab else { return }
+                selectedFeature = nil
+                selectedStoreCategory = nil
+                isShowingFeaturePicker = false
+                withAnimation(.easeInOut) {
+                    selectedBottomTab = requestedTab
+                    lastSelecteBottomTab = requestedTab
+                }
+                appState.requestedTabAfterAction = nil
+            }
         }.dynamicTypeSize(.medium)
     }
 

@@ -30,16 +30,13 @@ struct PantryResultView: View {
             }
             .background(Color(.systemGroupedBackground))
 
-            Button {
+            AddToCartButton(
+                title: "Add Missing Items (\(viewModel.likelyRunningLow.count))",
+                systemImage: "cart.badge.plus",
+                isDisabled: viewModel.likelyRunningLow.isEmpty
+            ) {
                 appState.cartStore.add(viewModel.likelyRunningLow.map(\.product))
-            } label: {
-                Label("Add Missing Items (\(viewModel.likelyRunningLow.count))", systemImage: "cart.badge.plus")
-                    .font(.system(size: 18, weight: .semibold))
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 52)
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(viewModel.likelyRunningLow.isEmpty)
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .background(.white)

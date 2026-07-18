@@ -88,15 +88,9 @@ struct SnapProductView: View {
                 ConfidenceBadge(confidence: detected.confidence)
             }
 
-            Button {
+            AddToCartButton(title: "Add to Cart", systemImage: "cart.badge.plus") {
                 appState.cartStore.add([product])
-            } label: {
-                Label("Add to Cart", systemImage: "cart.badge.plus")
-                    .font(.subheadline.weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 46)
             }
-            .buttonStyle(.borderedProminent)
         } else {
             HStack(alignment: .top, spacing: 10) {
                 Image(systemName: "questionmark.circle.fill")

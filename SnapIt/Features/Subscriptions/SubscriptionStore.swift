@@ -23,7 +23,7 @@ final class SubscriptionStore {
 }
 
 extension SubscriptionStore {
-    private static let demoAddress = "221B, Green Residency, Sector 45, Gurugram, Haryana 122003"
+    private static let demoAddress = "Zomato Office Farmhouse, Chhatarpur Farms, DLF Farms, New Delhi, Delhi 110030"
 
     static func dummySubscriptions() -> [Subscription] {
         let calendar = Calendar.current

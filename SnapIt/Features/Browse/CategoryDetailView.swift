@@ -64,7 +64,7 @@ struct CategoryDetailView: View {
                     Text("Delivering to :")
                         .font(.system(size: 11.5, weight: .bold))
                         .foregroundStyle(Color(red: 0.00, green: 0.42, blue: 0.44))
-                    Text("NH2 Stays PG…")
+                    Text("Zomato Farm")
                         .font(.system(size: 11.5, weight: .semibold))
                         .foregroundStyle(Color(red: 0.00, green: 0.42, blue: 0.44))
                         .lineLimit(1)

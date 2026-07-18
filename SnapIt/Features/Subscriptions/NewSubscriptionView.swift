@@ -23,7 +23,7 @@ struct NewSubscriptionView: View {
     @State private var showAddressAlert = false
     @State private var showStartedAlert = false
 
-    private static let hardcodedAddress = "221B, Green Residency, Sector 45, Gurugram, Haryana 122003"
+    private static let hardcodedAddress = "Zomato Office Farmhouse, Chhatarpur Farms, DLF Farms, New Delhi, Delhi 110030"
 
     private enum FrequencyMode: String, CaseIterable, Identifiable {
         case daily = "Daily"

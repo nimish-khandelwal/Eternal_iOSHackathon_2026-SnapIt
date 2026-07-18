@@ -147,7 +147,7 @@ struct CartView: View {
         }
         .navigationTitle("Checkout")
         .alert("Order placed 🎉", isPresented: $showOrderSuccess) {
-            Button("Done") {}
+            Button("Done") { appState.requestedTabAfterAction = 0 }
         } message: {
             Text("Delivery in 15 mins. We've saved this order so future quantity recommendations match how you actually shop.")
         }

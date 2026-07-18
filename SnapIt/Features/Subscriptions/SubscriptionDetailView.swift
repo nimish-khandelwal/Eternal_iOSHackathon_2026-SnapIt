@@ -142,6 +142,7 @@ struct SubscriptionDetailView: View {
             Text(title)
                 .font(.subheadline)
                 .foregroundStyle(isOn ? .primary : .secondary)
+                .multilineTextAlignment(.leading)
         }
     }
 
@@ -153,6 +154,8 @@ struct SubscriptionDetailView: View {
                 Text(subscription.address)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.leading)
+                Spacer(minLength: 0)
             }
         }
     }
