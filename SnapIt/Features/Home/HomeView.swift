@@ -364,7 +364,7 @@ struct HomeView: View {
                 FeatureActionRow(
                     icon: "barcode.viewfinder",
                     title: "Snap Product",
-                    subtitle: "Point at one item and add it instantly"
+                    subtitle: "Reads the label, or recognizes loose items like pulses"
                 ) {
                     open(.snapProduct)
                 }
@@ -372,7 +372,7 @@ struct HomeView: View {
                 FeatureActionRow(
                     icon: "list.clipboard",
                     title: "Shopping List",
-                    subtitle: "Scan a handwritten list or receipt"
+                    subtitle: "Text-only scan of a handwritten list or receipt"
                 ) {
                     open(.shoppingList)
                 }
@@ -380,7 +380,7 @@ struct HomeView: View {
                 FeatureActionRow(
                     icon: "refrigerator",
                     title: "Pantry Scan",
-                    subtitle: "Find likely refills from fridge or shelf"
+                    subtitle: "Reads labels and recognizes produce to spot refills"
                 ) {
                     open(.pantryScan)
                 }

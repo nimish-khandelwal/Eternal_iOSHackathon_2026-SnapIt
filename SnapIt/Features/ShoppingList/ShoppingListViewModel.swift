@@ -6,6 +6,8 @@ final class ShoppingListViewModel {
         let id = UUID()
         let detected: DetectedProduct
         var isIncluded = true
+        /// Populated only when the match is missing or under-confident.
+        var candidateProducts: [Product] = []
     }
 
     private let visionService: VisionService
@@ -40,7 +42,11 @@ final class ShoppingListViewModel {
             items = detected.map { d in
                 var enriched = d
                 enriched.matchedProduct = matcher.match(d)
-                return ChecklistItem(detected: enriched)
+
+                let candidates = (enriched.matchedProduct == nil || enriched.confidence < ProductMatcher.lowConfidenceThreshold)
+                    ? matcher.candidates(for: enriched)
+                    : []
+                return ChecklistItem(detected: enriched, candidateProducts: candidates)
             }
             phase = .results
         } catch {

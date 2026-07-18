@@ -8,12 +8,17 @@ struct PantryScanView: View {
         Group {
             switch viewModel?.phase ?? .capture {
             case .capture:
-                ScanCaptureScreen(title: "Pantry Scan", subtitle: "Show us your fridge or shelf") { image in
+                ScanCaptureScreen(title: "Pantry Scan", subtitle: "Reads labels & recognizes loose produce too") { image in
                     Task { await viewModel?.analyze(image: image) }
                 }
             case .analyzing:
                 if let image = viewModel?.capturedImage {
-                    ScanningOverlay(image: image)
+                    ScanningOverlay(image: image, captions: [
+                        "Reading labels…",
+                        "Recognizing produce…",
+                        "Checking your usuals…",
+                        "Comparing to last week…"
+                    ])
                 }
             case .results:
                 if let viewModel {

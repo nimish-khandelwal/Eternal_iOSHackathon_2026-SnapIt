@@ -8,12 +8,16 @@ struct SnapProductView: View {
         Group {
             switch viewModel?.phase ?? .capture {
             case .capture:
-                ScanCaptureScreen(title: "Snap Product", subtitle: "Point at a single item") { image in
+                ScanCaptureScreen(title: "Snap Product", subtitle: "Packaged or loose — we'll recognize it") { image in
                     Task { await viewModel?.analyze(image: image) }
                 }
             case .analyzing:
                 if let image = viewModel?.capturedImage {
-                    ScanningOverlay(image: image)
+                    ScanningOverlay(image: image, captions: [
+                        "Reading the label…",
+                        "Checking shape & color…",
+                        "Matching to catalog…"
+                    ])
                 }
             case .results:
                 resultCard
@@ -33,41 +37,74 @@ struct SnapProductView: View {
     }
 
     private var resultCard: some View {
-        VStack(spacing: 20) {
-            if let image = viewModel?.capturedImage {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxHeight: 240)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
+        ScrollView {
+            VStack(spacing: 16) {
+                if let image = viewModel?.capturedImage {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 220)
+                        .frame(maxWidth: .infinity)
+                        .clipped()
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                }
+
+                if let detected = viewModel?.detectedProduct {
+                    SectionCard(title: detected.matchedProduct != nil ? "Detected Product" : "Couldn't Match") {
+                        detectionSummary(for: detected)
+                    }
+
+                    if let candidates = viewModel?.candidateProducts, !candidates.isEmpty {
+                        ManualMatchPicker(candidates: candidates)
+                    }
+                }
+
+                Button("Scan Again") { viewModel?.retry() }
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 4)
             }
+            .padding(20)
+        }
+        .background(Color(.systemGroupedBackground))
+    }
 
-            if let detected = viewModel?.detectedProduct {
-                if let product = detected.matchedProduct {
-                    VStack(spacing: 8) {
-                        Text(product.name).font(.title3.weight(.semibold))
-                        Text("\(product.unit) · ₹\(Int(product.price))").foregroundStyle(.secondary)
-                        ConfidenceBadge(confidence: detected.confidence)
-                    }
+    @ViewBuilder
+    private func detectionSummary(for detected: DetectedProduct) -> some View {
+        if let product = detected.matchedProduct {
+            HStack(spacing: 14) {
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(product.categoryColor.opacity(0.15))
+                    .frame(width: 64, height: 64)
+                    .overlay(Text(product.emoji).font(.system(size: 30)))
 
-                    Button {
-                        appState.cartStore.add([product])
-                    } label: {
-                        Label("Add to Cart", systemImage: "cart.badge.plus")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
-                } else {
-                    Text("Detected \"\(detected.name)\" but couldn't match it to a Blinkit product.")
-                        .multilineTextAlignment(.center)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(product.name).font(.headline)
+                    Text("\(product.unit) · ₹\(Int(product.price))")
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
+                Spacer()
+                ConfidenceBadge(confidence: detected.confidence)
             }
 
-            Button("Scan Again") { viewModel?.retry() }
-                .buttonStyle(.bordered)
+            Button {
+                appState.cartStore.add([product])
+            } label: {
+                Label("Add to Cart", systemImage: "cart.badge.plus")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 46)
+            }
+            .buttonStyle(.borderedProminent)
+        } else {
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: "questionmark.circle.fill")
+                    .foregroundStyle(.orange)
+                Text("We saw \"\(detected.name)\" but couldn't match it to a catalog product.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
         }
-        .padding(24)
     }
 }
