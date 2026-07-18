@@ -4,16 +4,31 @@ struct ProductRow<Trailing: View>: View {
 
     let product: Product
     var subtitle: String?
+    var cartQuantity: Int?
     var trailing: Trailing
+
+    @Environment(AppState.self) private var appState
+    @State private var isShowingRecommendationInfo = false
 
     init(
         product: Product,
         subtitle: String? = nil,
+        cartQuantity: Int? = nil,
         @ViewBuilder trailing: () -> Trailing
     ) {
         self.product = product
         self.subtitle = subtitle
+        self.cartQuantity = cartQuantity
         self.trailing = trailing()
+    }
+
+    private var recommendedQuantity: Int? {
+        product.recommendedQuantity(using: appState.localOrders)
+    }
+
+    private var showsRecommendation: Bool {
+        guard let cartQuantity, let recommendedQuantity else { return false }
+        return cartQuantity < recommendedQuantity
     }
 
     var body: some View {
@@ -44,6 +59,11 @@ struct ProductRow<Trailing: View>: View {
             trailing
         }
         .padding(12)
+        .alert("Running low soon?", isPresented: $isShowingRecommendationInfo) {
+            Button("Got it", role: .cancel) {}
+        } message: {
+            Text("You usually order \(recommendedQuantity ?? 0) × \(product.name) — right now you've added \(cartQuantity ?? 0). Topping up to your usual amount means fewer reorders later.")
+        }
     }
 }
 

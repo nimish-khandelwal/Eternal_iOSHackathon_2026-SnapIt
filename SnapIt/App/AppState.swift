@@ -6,6 +6,7 @@ final class AppState {
     let catalogService: CatalogService
     let purchaseHistoryService: PurchaseHistoryService
     let cartStore: CartStore
+    let localOrders = LocalOrderHistoryStore()
     let subscriptionStore: SubscriptionStore
 
     init(cartStore: CartStore = CartStore(), subscriptionStore: SubscriptionStore = SubscriptionStore()) {
