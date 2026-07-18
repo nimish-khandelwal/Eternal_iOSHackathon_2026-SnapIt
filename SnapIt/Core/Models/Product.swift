@@ -10,4 +10,9 @@ struct Product: Identifiable, Codable, Hashable {
     let price: Double
     let unit: String
     let emoji: String
+    var brand: String? = nil
+    var mrp: Double? = nil
+    var discount: Int? = nil
+    var stock: Int? = nil
+    var rating: Double? = nil
 }

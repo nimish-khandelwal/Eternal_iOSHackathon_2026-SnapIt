@@ -4,6 +4,7 @@ struct HomeView: View {
     @Environment(AppState.self) private var appState
     @State private var isShowingFeaturePicker = false
     @State private var selectedFeature: LensFeature?
+    @State private var selectedStoreCategory: StoreCategory?
     @State private var selectedHeaderTab = 0
     @State private var selectedBottomTab = 0
     @State private var lastSelecteBottomTab = 0
@@ -41,6 +42,9 @@ struct HomeView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
+            .navigationDestination(item: $selectedStoreCategory) { category in
+                CategoryDetailView(category: category)
+            }
             .navigationDestination(item: $selectedFeature) { feature in
                 switch feature {
                 case .snapProduct:
@@ -248,7 +252,7 @@ struct HomeView: View {
             StoreCategory(title: "Dry Fruits &\nCereals", imageName: "BlinkitCereal"),
             StoreCategory(title: "Chicken,\nMeat & Fish", imageName: "BlinkitMeat"),
             StoreCategory(title: "Kitchenware\n& Appliances", imageName: "BlinkitKitchenware")
-        ])
+        ]) { selectedStoreCategory = $0 }
     }
 
     private var snacksSection: some View {
@@ -257,7 +261,7 @@ struct HomeView: View {
             StoreCategory(title: "Sweets &\nChocolates", imageName: "BlinkitSweets"),
             StoreCategory(title: "Drinks &\nJuices", imageName: "BlinkitDrinks"),
             StoreCategory(title: "Tea, Coffee\n& Milk Drinks", imageName: "BlinkitTea")
-        ])
+        ]) { selectedStoreCategory = $0 }
     }
 
     private var breakfastSection: some View {
@@ -266,7 +270,7 @@ struct HomeView: View {
             StoreCategory(title: "Noodles &\nPasta", imageName: "BlinkitAtta"),
             StoreCategory(title: "Frozen\nFoods", imageName: "BlinkitMeat"),
             StoreCategory(title: "Ice Creams\n& More", imageName: "BlinkitSweets")
-        ])
+        ]) { selectedStoreCategory = $0 }
     }
 
     private static let bottomTabs: [(defaultImageName: String, selectedImageName: String, title: String)] = [
@@ -485,6 +489,7 @@ private struct HeaderCategory: View {
 private struct CategorySection: View {
     let title: String
     let items: [StoreCategory]
+    var onSelect: (StoreCategory) -> Void = { _ in }
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 4)
 
@@ -497,7 +502,7 @@ private struct CategorySection: View {
 
             LazyVGrid(columns: columns, alignment: .center, spacing: 12) {
                 ForEach(items) { item in
-                    CategoryTile(item: item)
+                    CategoryTile(item: item, onSelect: onSelect)
                 }
             }
             .padding(.horizontal, 12)
@@ -508,17 +513,23 @@ private struct CategorySection: View {
     }
 }
 
-private struct StoreCategory: Identifiable {
+struct StoreCategory: Identifiable, Hashable {
     let id = UUID()
     let title: String
     let imageName: String
+
+    var displayTitle: String {
+        title.replacingOccurrences(of: "\n", with: " ")
+    }
 }
 
 private struct CategoryTile: View {
     let item: StoreCategory
+    var onSelect: (StoreCategory) -> Void = { _ in }
 
     var body: some View {
         Button {
+            onSelect(item)
         } label: {
             content
         }
