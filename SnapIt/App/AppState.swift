@@ -6,6 +6,7 @@ final class AppState {
     let catalogService: CatalogService
     let purchaseHistoryService: PurchaseHistoryService
     let cartStore: CartStore
+    let localOrders = LocalOrderHistoryStore()
 
     init(cartStore: CartStore = CartStore()) {
         // Swap point: flip to OpenAIVisionService() or GeminiVisionService()

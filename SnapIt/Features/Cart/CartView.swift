@@ -2,7 +2,15 @@ import SwiftUI
 
 struct CartView: View {
     @Environment(AppState.self) private var appState
-    @State private var showCheckoutAlert = false
+    @State private var isProcessingPayment = false
+    @State private var showOrderSuccess = false
+
+    // Single source of truth for all money shown on this screen.
+    private var subtotal: Double { appState.cartStore.totalPrice }
+    private var discount: Double { subtotal > 200 ? 50 : 0 }
+    private var deliveryCharge: Double { subtotal < 200 ? 20 : 0 }
+    private var handlingCharge: Double { 12 }
+    private var grandTotal: Double { max(0, subtotal - discount + deliveryCharge + handlingCharge) }
 
     var body: some View {
         Group {
@@ -39,16 +47,20 @@ struct CartView: View {
                                     Spacer()
                                 }
                                 .padding(.top, 12)
-                            
+
+                            Divider()
+                                .padding(.horizontal, 12)
+                                .padding(.top, 10)
+
                             ForEach(appState.cartStore.items) { item in
                                 
-                                ProductRow(product: item.product) {
+                                ProductRow(product: item.product, cartQuantity: item.quantity) {
                                     QuantityControl(item: item)
                                 }
                                 
                                 if item.id != appState.cartStore.items.last?.id {
                                     Divider()
-                                        .padding(.leading, 94)
+                                        .padding(.leading, 80)
                                 }
                             }
                         }
@@ -58,14 +70,15 @@ struct CartView: View {
                             RoundedRectangle(cornerRadius: 18)
                                 .stroke(.gray.opacity(0.08))
                         }
-                        
+                        .disabled(isProcessingPayment)
+
                         // MARK: - Bill Details
                         
                         BillDetailsCard(
-                            subtotal: appState.cartStore.totalPrice,
-                            discount: 50,
-                            delivery: appState.cartStore.totalPrice < 200 ? 20 : 0,
-                            handling: 12
+                            subtotal: subtotal,
+                            discount: discount,
+                            delivery: deliveryCharge,
+                            handling: handlingCharge
                         )
                         
                         // MARK: - Cancellation Policy
@@ -93,24 +106,32 @@ struct CartView: View {
                                 
                                 Spacer()
                                 
-                                Text("₹\(Int(appState.cartStore.totalPrice - 50 + 2))")
+                                Text("₹\(Int(grandTotal.rounded()))")
                                     .font(.system(size: 18, weight: .bold))
                             }
                             
                             Button {
-                                
-                                showCheckoutAlert = true
-                                
+                                placeOrder()
                             } label: {
-                                
-                                Text("Add payment method")
-                                    .font(.system(size: 18, weight: .semibold))
-                                    .foregroundStyle(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 52)
-                                    .background(Color.green)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                                Group {
+                                    if isProcessingPayment {
+                                        HStack(spacing: 10) {
+                                            ProgressView()
+                                                .tint(.white)
+                                            Text("Processing payment…")
+                                        }
+                                    } else {
+                                        Text("Place Order")
+                                    }
+                                }
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 52)
+                                .background(Color.green.opacity(isProcessingPayment ? 0.7 : 1))
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
                             }
+                            .disabled(isProcessingPayment)
                             
                         }
                         .padding(.horizontal, 16)
@@ -125,10 +146,28 @@ struct CartView: View {
             }
         }
         .navigationTitle("Checkout")
-        .alert("This is a hackathon demo", isPresented: $showCheckoutAlert) {
-            Button("OK", role: .cancel) {}
+        .alert("Order placed 🎉", isPresented: $showOrderSuccess) {
+            Button("Done") {}
         } message: {
-            Text("Checkout isn't wired to a real payment flow.")
+            Text("Delivery in 15 mins. We've saved this order so future quantity recommendations match how you actually shop.")
+        }
+    }
+
+    private func placeOrder() {
+        isProcessingPayment = true
+        // Snapshot now so mid-payment cart edits don't change what gets recorded.
+        let orderedItems = appState.cartStore.items
+
+        Task { @MainActor in
+            // Simulated payment gateway round-trip.
+            try? await Task.sleep(for: .seconds(1.4))
+
+            appState.localOrders.recordOrder(items: orderedItems)
+            // Clear here (not in the alert) so leaving the screen mid-payment
+            // can't leave a stale cart that would double-record on retry.
+            appState.cartStore.items = []
+            isProcessingPayment = false
+            showOrderSuccess = true
         }
     }
 }
@@ -141,7 +180,7 @@ struct BillDetailsCard: View {
     let handling: Double
 
     var total: Double {
-        subtotal - discount + delivery + handling
+        max(0, subtotal - discount + delivery + handling)
     }
 
     var body: some View {
@@ -151,13 +190,19 @@ struct BillDetailsCard: View {
             Text("Bill Details")
                 .font(.system(size: 17, weight: .bold))
 
-            billRow("Items total", "₹\(Int(subtotal))")
+            billRow("Items total", "₹\(Int(subtotal.rounded()))")
 
-            billRow("Flat ₹50 OFF", "-₹50", valueColor: .green)
-            
-            billRow("Delivery charge", "\(self.delivery == 0 ? "FREE" : "10")", valueColor: .green)
+            if discount > 0 {
+                billRow("Flat ₹50 OFF", "-₹\(Int(discount.rounded()))", valueColor: .green)
+            }
 
-            billRow("Handling charge", "₹12")
+            billRow(
+                "Delivery charge",
+                delivery == 0 ? "FREE" : "₹\(Int(delivery.rounded()))",
+                valueColor: delivery == 0 ? .green : .primary
+            )
+
+            billRow("Handling charge", "₹\(Int(handling.rounded()))")
 
             Divider()
 
@@ -168,7 +213,7 @@ struct BillDetailsCard: View {
 
                 Spacer()
 
-                Text("₹\(Int(total))")
+                Text("₹\(Int(total.rounded()))")
                     .font(.system(size: 16, weight: .bold))
             }
         }
@@ -208,7 +253,7 @@ struct QuantityControl: View {
     let item: CartItem
 
     var body: some View {
-        VStack(spacing: 6) {
+        VStack(alignment: .trailing, spacing: 8) {
 
             HStack(spacing: 14) {
 
@@ -237,55 +282,87 @@ struct QuantityControl: View {
                 }
             }
             .foregroundStyle(.white)
-            .frame(width: 76, height: 34)
-            .background(.green)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .frame(width: 84, height: 34)
+            .background(item.quantity >= (item.product.recommendedQuantity(using: appState.localOrders) ?? 0) ? Color.green : Color.orange)
+            .clipShape(Capsule())
+            .animation(.easeInOut(duration: 0.18), value: item.quantity)
 
-            HStack(spacing: 4) {
-                Text("₹\(Int(item.product.price + 40))")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.gray)
-                    .strikethrough()
+            HStack(spacing: 5) {
+                if let mrp = item.product.mrp, mrp > item.product.price {
+                    Text("₹\(Int(mrp.rounded()))")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.gray)
+                        .strikethrough()
+                }
 
-                Text("₹\(Int(item.product.price))")
-                    .font(.system(size: 15, weight: .bold))
+                Text("₹\(Int(item.product.price.rounded()))")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(.black)
             }
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
         }
     }
 }
 
-#Preview("Checkout") {
+#Preview("Cart with items") {
 
     let appState = AppState()
 
-    // Sample Products
-    let nuggets = Product(
-        id: "123",
-        name: "Godrej Yummiez Chicken Nuggets",
-        synonyms: [],
-        category: "Godrej",
-        price: 269,
-        unit: "1",
-        emoji: "/"
-    )
-    
-    let potato = Product(
-        id: "123",
-        name: "McCain Chilli Garlic Potato Bite Nuggets",
-        synonyms: [],
-        category: "McCain",
-        price: 218,
-        unit: "1",
-        emoji: "-"
-    )
-
-    appState.cartStore.items = [
-        CartItem(product: nuggets, quantity: 1),
-        CartItem(product: potato, quantity: 1)
+    let sampleProducts = [
+        Product(
+            id: "yummiez-nuggets",
+            name: "Godrej Yummiez Chicken Nuggets",
+            synonyms: [],
+            category: "Frozen",
+            price: 269,
+            unit: "400 g",
+            emoji: "🍗",
+            mrp: 319
+        ),
+        Product(
+            id: "mccain-potato-bites",
+            name: "McCain Chilli Garlic Potato Bites",
+            synonyms: [],
+            category: "Frozen",
+            price: 218,
+            unit: "420 g",
+            emoji: "🥔",
+            mrp: 249
+        ),
+        Product(
+            id: "amul-taaza-milk",
+            name: "Amul Taaza Toned Milk",
+            synonyms: [],
+            category: "Dairy",
+            price: 74,
+            unit: "1 L",
+            emoji: "🥛",
+            mrp: 78
+        )
     ]
 
-   return NavigationStack {
+    appState.cartStore.items = [
+        CartItem(product: sampleProducts[0], quantity: 1),
+        CartItem(product: sampleProducts[1], quantity: 2),
+        CartItem(product: sampleProducts[2], quantity: 1)
+    ]
+
+    // Fake one past order so the recommendation chip and orange stepper
+    // are visible in the canvas (store is in-memory during previews).
+    appState.localOrders.recordOrder(items: [
+        CartItem(product: sampleProducts[0], quantity: 4)
+    ])
+
+    return NavigationStack {
         CartView()
     }
     .environment(appState)
+}
+
+#Preview("Empty cart") {
+    NavigationStack {
+        CartView()
+    }
+    .environment(AppState())
 }
