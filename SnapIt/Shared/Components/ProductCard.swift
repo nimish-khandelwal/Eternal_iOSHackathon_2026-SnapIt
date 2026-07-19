@@ -45,21 +45,24 @@ struct ProductCard: View {
                     .foregroundStyle(.white)
             }
         } else {
-            HStack(spacing: 8) {
+            HStack(spacing: 0) {
                 Button(action: onDecrement) {
                     Image(systemName: "minus")
+                        .frame(width: 22, height: 26)
+                        .contentShape(Rectangle())
                 }
                 Text("\(quantityInCart)")
-                    .frame(minWidth: 12)
+                    .frame(width: 18)
                 Button(action: onIncrement) {
                     Image(systemName: "plus")
+                        .frame(width: 22, height: 26)
+                        .contentShape(Rectangle())
                 }
             }
+            .buttonStyle(.plain)
             .font(.caption.weight(.bold))
-            .padding(.horizontal, 8)
-            .padding(.vertical, 5)
-            .background(Color.accentColor, in: Capsule())
             .foregroundStyle(.white)
+            .background(Color.accentColor, in: Capsule())
         }
     }
 }

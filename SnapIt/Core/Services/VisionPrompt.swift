@@ -11,6 +11,13 @@ enum VisionPrompt {
         }
     }
 
+    /// Given to the model so its `category` guess lines up with real catalog
+    /// categories instead of inventing its own labels.
+    private static let categoryList = """
+    Dairy, Eggs & Meat, Bakery, Beverages, Instant Food, Frozen Food, Snacks, Staples, \
+    Vegetables, Fruits, Personal Care, Cleaning, Tea & Coffee, Spices, Baby Care, Sweets
+    """
+
     private static let pantryScan = """
     You are a grocery inventory detector looking at a photo of a fridge, pantry, or kitchen shelf.
 
@@ -25,12 +32,16 @@ enum VisionPrompt {
     entry with an estimated quantity. Lower the confidence score when you're relying on visual
     appearance alone rather than a readable label.
 
+    For every item, also guess the single best-fitting category from this exact list
+    (copy one of these strings exactly, do not invent your own):
+    \(categoryList)
+
     Ignore: utensils, cookware, appliances, furniture, people, hands, decorations.
 
     Return ONLY this JSON, no prose:
     {
       "detected_products": [
-        { "name": "Milk", "confidence": 0.93, "quantity_estimate": 1 }
+        { "name": "Milk", "confidence": 0.93, "quantity_estimate": 1, "category": "Dairy" }
       ]
     }
 
@@ -46,10 +57,14 @@ enum VisionPrompt {
        color, and texture (for example: split orange-yellow lentils are "Toor Dal", a bundle of
        long green stalks is "Coriander Leaves").
 
+    Also guess the single best-fitting category from this exact list
+    (copy one of these strings exactly, do not invent your own):
+    \(categoryList)
+
     Return ONLY this JSON:
     {
       "detected_products": [
-        { "name": "Maggi 2-Minute Noodles", "confidence": 0.97 }
+        { "name": "Maggi 2-Minute Noodles", "confidence": 0.97, "category": "Instant Food" }
       ]
     }
 
@@ -67,10 +82,14 @@ enum VisionPrompt {
     where obvious (e.g. "brd" -> "Bread"). Ignore prices, totals, store names, and taxes
     unless a line is clearly an item name. If a line is illegible, skip it rather than guessing.
 
+    For every item, also guess the single best-fitting category from this exact list
+    (copy one of these strings exactly, do not invent your own):
+    \(categoryList)
+
     Return ONLY this JSON:
     {
       "detected_products": [
-        { "name": "Bread", "confidence": 0.88 }
+        { "name": "Bread", "confidence": 0.88, "category": "Bakery" }
       ]
     }
     """

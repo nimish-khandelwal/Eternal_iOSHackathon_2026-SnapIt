@@ -29,7 +29,7 @@ struct CartView: View {
                             
                                 HStack(spacing: 2) {
                                     Image(systemName: "clock.circle")
-                                        .foregroundStyle(.green)
+                                        .foregroundStyle(.accent)
                                         .scaledToFill()
                                         .imageScale(.large)
                                         .frame(width: 50, height: 50)
@@ -128,7 +128,7 @@ struct CartView: View {
                                 .foregroundStyle(.white)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 52)
-                                .background(Color.green.opacity(isProcessingPayment ? 0.7 : 1))
+                                .background(Color.accent.opacity(isProcessingPayment ? 0.7 : 1))
                                 .clipShape(RoundedRectangle(cornerRadius: 16))
                             }
                             .disabled(isProcessingPayment)
@@ -193,13 +193,13 @@ struct BillDetailsCard: View {
             billRow("Items total", "₹\(Int(subtotal.rounded()))")
 
             if discount > 0 {
-                billRow("Flat ₹50 OFF", "-₹\(Int(discount.rounded()))", valueColor: .green)
+                billRow("Flat ₹50 OFF", "-₹\(Int(discount.rounded()))", valueColor: .accent)
             }
 
             billRow(
                 "Delivery charge",
                 delivery == 0 ? "FREE" : "₹\(Int(delivery.rounded()))",
-                valueColor: delivery == 0 ? .green : .primary
+                valueColor: delivery == 0 ? .accent : .primary
             )
 
             billRow("Handling charge", "₹\(Int(handling.rounded()))")
@@ -255,7 +255,7 @@ struct QuantityControl: View {
     var body: some View {
         VStack(alignment: .trailing, spacing: 8) {
 
-            HStack(spacing: 14) {
+            HStack(spacing: 0) {
 
                 Button {
                     appState.cartStore.updateQuantity(
@@ -265,11 +265,13 @@ struct QuantityControl: View {
                 } label: {
                     Image(systemName: "minus")
                         .font(.system(size: 11, weight: .bold))
+                        .frame(width: 28, height: 34)
+                        .contentShape(Rectangle())
                 }
 
                 Text("\(item.quantity)")
                     .font(.system(size: 15, weight: .bold))
-                    .frame(minWidth: 16)
+                    .frame(width: 28)
 
                 Button {
                     appState.cartStore.updateQuantity(
@@ -279,11 +281,14 @@ struct QuantityControl: View {
                 } label: {
                     Image(systemName: "plus")
                         .font(.system(size: 11, weight: .bold))
+                        .frame(width: 28, height: 34)
+                        .contentShape(Rectangle())
                 }
             }
+            .buttonStyle(.plain)
             .foregroundStyle(.white)
             .frame(width: 84, height: 34)
-            .background(.green)
+            .background(.accent)
             .clipShape(Capsule())
             .animation(.easeInOut(duration: 0.18), value: item.quantity)
 

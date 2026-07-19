@@ -8,8 +8,8 @@ final class SnapProductViewModel {
     var phase: ScanPhase = .capture
     var capturedImage: UIImage?
     var detectedProduct: DetectedProduct?
-    /// Populated only when the match is missing or under-confident — drives
-    /// the manual "pick the actual product" picker under the result.
+    /// Always populated — nothing is auto-selected, the picker is how every
+    /// result gets added to the cart, confident match or not.
     var candidateProducts: [Product] = []
 
     init(visionService: VisionService, catalogService: CatalogService) {
@@ -31,12 +31,7 @@ final class SnapProductViewModel {
             let matcher = ProductMatcher(catalog: catalog)
             first.matchedProduct = matcher.match(first)
             detectedProduct = first
-
-            if first.matchedProduct == nil || first.confidence < ProductMatcher.lowConfidenceThreshold {
-                candidateProducts = matcher.candidates(for: first)
-            } else {
-                candidateProducts = []
-            }
+            candidateProducts = matcher.candidates(for: first)
             phase = .results
         } catch {
             phase = .error(error.localizedDescription)

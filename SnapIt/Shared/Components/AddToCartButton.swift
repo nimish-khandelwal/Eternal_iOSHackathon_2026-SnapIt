@@ -34,7 +34,7 @@ struct AddToCartButton: View {
                 .scaleEffect(isConfirming ? 1.04 : 1)
         }
         .buttonStyle(.borderedProminent)
-        .tint(isConfirming ? .green : .accentColor)
+        .tint(isConfirming ? .accent : .accentColor)
         .disabled(isDisabled || isConfirming)
         .animation(.spring(response: 0.32, dampingFraction: 0.55), value: isConfirming)
     }

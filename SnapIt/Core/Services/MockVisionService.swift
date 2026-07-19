@@ -9,20 +9,23 @@ final class MockVisionService: VisionService {
         switch mode {
         case .pantryScan:
             return [
-                DetectedProduct(name: "Amul Butter", confidence: 0.89),     // read from packaging
-                DetectedProduct(name: "Onions", confidence: 0.82),          // visual — no label
-                DetectedProduct(name: "Fresh Coriander", confidence: 0.71)  // visual — not in catalog, shows up as unrecognized
+                DetectedProduct(name: "Amul Butter", confidence: 0.89, suggestedCategory: "Dairy"),
+                DetectedProduct(name: "Onions", confidence: 0.82, suggestedCategory: "Vegetables"),
+                // Not in the generated catalog at all — demonstrates the
+                // category fallback: no product matches "coriander", but the
+                // picker still shows relevant Vegetables instead of a random list.
+                DetectedProduct(name: "Fresh Coriander", confidence: 0.71, suggestedCategory: "Vegetables")
             ]
         case .singleProduct:
             return [
-                DetectedProduct(name: "Amul Milk", confidence: 0.97)  // read from packaging
+                DetectedProduct(name: "Amul Milk", confidence: 0.97, suggestedCategory: "Dairy")
             ]
         case .shoppingList:
             return [
-                DetectedProduct(name: "Amul Milk", confidence: 0.90),
-                DetectedProduct(name: "Mother Dairy Toor Dal", confidence: 0.87),
-                DetectedProduct(name: "Amul Paratha", confidence: 0.85),
-                DetectedProduct(name: "Patanjali Toothpaste", confidence: 0.83)
+                DetectedProduct(name: "Amul Milk", confidence: 0.90, suggestedCategory: "Dairy"),
+                DetectedProduct(name: "Mother Dairy Toor Dal", confidence: 0.87, suggestedCategory: "Staples"),
+                DetectedProduct(name: "Amul Paratha", confidence: 0.85, suggestedCategory: "Frozen Food"),
+                DetectedProduct(name: "Patanjali Toothpaste", confidence: 0.83, suggestedCategory: "Personal Care")
             ]
         }
     }

@@ -70,7 +70,7 @@ struct SubscriptionDetailView: View {
             }
 
             ProgressView(value: Double(subscription.deliveriesCompleted), total: Double(subscription.totalDeliveries))
-                .tint(.green)
+                .tint(.accent)
 
             Text("\(subscription.deliveriesCompleted) of \(subscription.totalDeliveries) deliveries completed")
                 .font(.caption)
@@ -79,7 +79,7 @@ struct SubscriptionDetailView: View {
             if subscription.status == .active, let next = subscription.nextDeliveryDate {
                 Text("Next delivery: \(next.formatted(date: .abbreviated, time: .omitted))")
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(.green)
+                    .foregroundStyle(.accent)
             }
 
             Divider()
@@ -138,7 +138,7 @@ struct SubscriptionDetailView: View {
     private func preferenceRow(_ title: String, isOn: Bool) -> some View {
         HStack {
             Image(systemName: isOn ? "checkmark.circle.fill" : "circle")
-                .foregroundStyle(isOn ? .green : .secondary)
+                .foregroundStyle(isOn ? .accent : .secondary)
             Text(title)
                 .font(.subheadline)
                 .foregroundStyle(isOn ? .primary : .secondary)
@@ -150,7 +150,7 @@ struct SubscriptionDetailView: View {
         SectionCard(title: "Delivery Address") {
             HStack(alignment: .top, spacing: 10) {
                 Image(systemName: "mappin.circle.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(.accent)
                 Text(subscription.address)
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -176,7 +176,7 @@ struct SubscriptionDetailView: View {
                     .frame(height: 48)
                 }
                 .buttonStyle(.bordered)
-                .tint(subscription.status == .active ? .orange : .green)
+                .tint(subscription.status == .active ? .orange : .accent)
 
                 Button {
                     pendingAction = .stop

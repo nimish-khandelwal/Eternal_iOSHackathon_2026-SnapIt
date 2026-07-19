@@ -48,15 +48,15 @@ struct ShoppingListScanView: View {
             }
             .background(Color(.systemGroupedBackground))
 
-            AddToCartButton(
-                title: "Add All (\(viewModel?.selectedProducts.count ?? 0))",
-                systemImage: "cart.badge.plus",
-                isDisabled: (viewModel?.selectedProducts.isEmpty) ?? true
-            ) {
-                if let viewModel {
-                    appState.cartStore.add(viewModel.selectedProducts)
-                }
+            Button {
+                appState.requestedTabAfterAction = 4
+            } label: {
+                Text("Done")
+                    .font(.system(size: 18, weight: .semibold))
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
             }
+            .buttonStyle(.borderedProminent)
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .background(.white)
@@ -65,39 +65,27 @@ struct ShoppingListScanView: View {
 
     private func itemCard(for item: ShoppingListViewModel.ChecklistItem) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 12) {
-                if let product = item.detected.matchedProduct {
-                    ProductRow(product: product, subtitle: subtitle(for: item.detected))
-                } else {
-                    HStack(spacing: 12) {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color.orange.opacity(0.15))
-                            .frame(width: 44, height: 44)
-                            .overlay(Image(systemName: "questionmark").foregroundStyle(.orange))
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(item.detected.name).font(.subheadline.weight(.medium))
-                            Text("not in the Blinkit catalog yet")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "text.viewfinder")
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 2)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("\"\(item.detected.name)\"")
+                        .font(.subheadline.weight(.medium))
+                    Text("Pick the actual product below")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
-
-                Spacer(minLength: 8)
-
-                Button {
-                    toggleIncluded(item)
-                } label: {
-                    Image(systemName: item.isIncluded ? "checkmark.circle.fill" : "circle")
-                        .font(.title2)
-                        .foregroundStyle(item.isIncluded ? Color.green : .secondary)
-                }
-                .buttonStyle(.plain)
+                Spacer()
+                ConfidenceBadge(confidence: item.detected.confidence)
             }
-            .opacity(item.isIncluded ? 1 : 0.4)
 
             if !item.candidateProducts.isEmpty {
                 ManualMatchPicker(candidates: item.candidateProducts)
+            } else {
+                Text("No close matches in the Blinkit catalog yet.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
         .padding(12)
@@ -107,16 +95,5 @@ struct ShoppingListScanView: View {
             RoundedRectangle(cornerRadius: 18)
                 .stroke(.gray.opacity(0.08))
         }
-    }
-
-    private func subtitle(for detected: DetectedProduct) -> String {
-        detected.confidence < ProductMatcher.lowConfidenceThreshold
-            ? "detected as \"\(detected.name)\" · \(Int(detected.confidence * 100))% confidence"
-            : "detected as \"\(detected.name)\""
-    }
-
-    private func toggleIncluded(_ item: ShoppingListViewModel.ChecklistItem) {
-        guard let index = viewModel?.items.firstIndex(where: { $0.id == item.id }) else { return }
-        viewModel?.items[index].isIncluded.toggle()
     }
 }

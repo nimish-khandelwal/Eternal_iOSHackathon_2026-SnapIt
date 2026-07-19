@@ -5,8 +5,8 @@ final class ShoppingListViewModel {
     struct ChecklistItem: Identifiable {
         let id = UUID()
         let detected: DetectedProduct
-        var isIncluded = true
-        /// Populated only when the match is missing or under-confident.
+        /// Always populated — nothing is auto-selected, so every line is
+        /// added to the cart by manually picking from this shortlist.
         var candidateProducts: [Product] = []
     }
 
@@ -20,10 +20,6 @@ final class ShoppingListViewModel {
     init(visionService: VisionService, catalogService: CatalogService) {
         self.visionService = visionService
         self.catalogService = catalogService
-    }
-
-    var selectedProducts: [Product] {
-        items.filter(\.isIncluded).compactMap(\.detected.matchedProduct)
     }
 
     func analyze(image: UIImage) async {
@@ -42,11 +38,7 @@ final class ShoppingListViewModel {
             items = detected.map { d in
                 var enriched = d
                 enriched.matchedProduct = matcher.match(d)
-
-                let candidates = (enriched.matchedProduct == nil || enriched.confidence < ProductMatcher.lowConfidenceThreshold)
-                    ? matcher.candidates(for: enriched)
-                    : []
-                return ChecklistItem(detected: enriched, candidateProducts: candidates)
+                return ChecklistItem(detected: enriched, candidateProducts: matcher.candidates(for: enriched))
             }
             phase = .results
         } catch {

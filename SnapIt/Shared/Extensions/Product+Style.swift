@@ -13,7 +13,7 @@ extension Product {
         case "Frozen Food": return .cyan
         case "Snacks": return .mint
         case "Staples": return .brown
-        case "Vegetables": return .green
+        case "Vegetables": return .accent
         case "Fruits": return .red
         case "Personal Care": return .purple
         case "Cleaning": return .teal

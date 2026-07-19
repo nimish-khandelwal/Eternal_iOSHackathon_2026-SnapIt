@@ -7,7 +7,7 @@ struct StatusPill: View {
     private var tint: Color {
         switch status {
         case .likelyRunningLow: return .red
-        case .stillAvailable: return .green
+        case .stillAvailable: return .accent
         case .notDetected: return .gray
         }
     }

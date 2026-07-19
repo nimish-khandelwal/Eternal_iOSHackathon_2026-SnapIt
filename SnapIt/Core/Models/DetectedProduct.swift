@@ -6,13 +6,24 @@ struct DetectedProduct: Identifiable {
     let name: String
     let confidence: Double
     var quantityEstimate: Int?
+    /// The model's own best guess at a category (from a closed list we give it
+    /// in the prompt) — used to ground the manual-pick shortlist in something
+    /// sensible when nothing in the catalog matches the name at all.
+    var suggestedCategory: String?
     var matchedProduct: Product?
 
-    init(name: String, confidence: Double, quantityEstimate: Int? = nil, matchedProduct: Product? = nil) {
+    init(
+        name: String,
+        confidence: Double,
+        quantityEstimate: Int? = nil,
+        suggestedCategory: String? = nil,
+        matchedProduct: Product? = nil
+    ) {
         self.id = UUID()
         self.name = name
         self.confidence = confidence
         self.quantityEstimate = quantityEstimate
+        self.suggestedCategory = suggestedCategory
         self.matchedProduct = matchedProduct
     }
 }
@@ -21,6 +32,7 @@ extension DetectedProduct: Decodable {
     private enum CodingKeys: String, CodingKey {
         case name, confidence
         case quantityEstimate = "quantity_estimate"
+        case suggestedCategory = "category"
     }
 
     init(from decoder: Decoder) throws {
@@ -28,7 +40,8 @@ extension DetectedProduct: Decodable {
         self.init(
             name: try container.decode(String.self, forKey: .name),
             confidence: try container.decode(Double.self, forKey: .confidence),
-            quantityEstimate: try container.decodeIfPresent(Int.self, forKey: .quantityEstimate)
+            quantityEstimate: try container.decodeIfPresent(Int.self, forKey: .quantityEstimate),
+            suggestedCategory: try container.decodeIfPresent(String.self, forKey: .suggestedCategory)
         )
     }
 }

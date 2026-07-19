@@ -50,12 +50,16 @@ struct SnapProductView: View {
                 }
 
                 if let detected = viewModel?.detectedProduct {
-                    SectionCard(title: detected.matchedProduct != nil ? "Detected Product" : "Couldn't Match") {
+                    SectionCard(title: "What We Saw") {
                         detectionSummary(for: detected)
                     }
 
                     if let candidates = viewModel?.candidateProducts, !candidates.isEmpty {
                         ManualMatchPicker(candidates: candidates)
+                    } else {
+                        Text("No close matches in the Blinkit catalog yet.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
                 }
 
@@ -69,36 +73,19 @@ struct SnapProductView: View {
         .background(Color(.systemGroupedBackground))
     }
 
-    @ViewBuilder
     private func detectionSummary(for detected: DetectedProduct) -> some View {
-        if let product = detected.matchedProduct {
-            HStack(spacing: 14) {
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(product.categoryColor.opacity(0.15))
-                    .frame(width: 64, height: 64)
-                    .overlay(Text(product.emoji).font(.system(size: 30)))
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(product.name).font(.headline)
-                    Text("\(product.unit) · ₹\(Int(product.price))")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer()
-                ConfidenceBadge(confidence: detected.confidence)
-            }
-
-            AddToCartButton(title: "Add to Cart", systemImage: "cart.badge.plus") {
-                appState.cartStore.add([product])
-            }
-        } else {
-            HStack(alignment: .top, spacing: 10) {
-                Image(systemName: "questionmark.circle.fill")
-                    .foregroundStyle(.orange)
-                Text("We saw \"\(detected.name)\" but couldn't match it to a catalog product.")
-                    .font(.subheadline)
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "text.viewfinder")
+                .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\"\(detected.name)\"")
+                    .font(.subheadline.weight(.medium))
+                Text("Pick the actual product below")
+                    .font(.caption)
                     .foregroundStyle(.secondary)
             }
+            Spacer()
+            ConfidenceBadge(confidence: detected.confidence)
         }
     }
 }

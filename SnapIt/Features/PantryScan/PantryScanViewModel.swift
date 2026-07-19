@@ -34,8 +34,9 @@ final class PantryScanViewModel {
         uncertainDetections.filter { $0.detected.matchedProduct == nil }
     }
 
-    /// Candidates for a "Still Available" row whose match was under-confident,
-    /// so the row can offer a "not quite right?" picker beneath it.
+    /// Candidates for a "Still Available" row — shown regardless of match
+    /// confidence, since nothing is auto-selected; this is how the row's
+    /// product gets corrected (or just reinforced) by hand.
     func candidates(forMatchedProductID productID: String) -> [Product]? {
         uncertainDetections.first { $0.detected.matchedProduct?.id == productID }?.candidates
     }
@@ -58,7 +59,6 @@ final class PantryScanViewModel {
             }
 
             uncertainDetections = enrichedDetected
-                .filter { $0.matchedProduct == nil || $0.confidence < ProductMatcher.lowConfidenceThreshold }
                 .map { UncertainDetection(id: $0.id, detected: $0, candidates: matcher.candidates(for: $0)) }
 
             results = ComparisonEngine().compare(frequent: history, detected: enrichedDetected, today: Date())

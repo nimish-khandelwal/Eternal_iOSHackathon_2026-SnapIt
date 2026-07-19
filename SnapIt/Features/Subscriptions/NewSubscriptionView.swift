@@ -58,7 +58,7 @@ struct NewSubscriptionView: View {
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 52)
-                    .background(canStart ? Color.green : Color.gray.opacity(0.4))
+                    .background(canStart ? Color.accent : Color.gray.opacity(0.4))
                     .clipShape(RoundedRectangle(cornerRadius: 16))
             }
             .disabled(!canStart)
@@ -142,7 +142,7 @@ struct NewSubscriptionView: View {
         }
         .foregroundStyle(.white)
         .frame(width: 76, height: 34)
-        .background(.green)
+        .background(.accent)
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
@@ -251,7 +251,7 @@ struct NewSubscriptionView: View {
         SectionCard(title: "Delivery Address") {
             HStack(alignment: .top, spacing: 10) {
                 Image(systemName: "mappin.circle.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(.accent)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Home").font(.subheadline.weight(.semibold))
                     Text(Self.hardcodedAddress).font(.caption).foregroundStyle(.secondary)
@@ -279,7 +279,7 @@ struct NewSubscriptionView: View {
                 billRow("No. of deliveries", "× \(draft.totalDeliveries)")
                 Divider()
                 billRow("Items total", "₹\(Int(draft.itemsTotal))")
-                billRow("Subscription savings (10%)", "-₹\(Int(draft.discountAmount))", valueColor: .green)
+                billRow("Subscription savings (10%)", "-₹\(Int(draft.discountAmount))", valueColor: .accent)
                 Divider()
                 HStack {
                     Text("Total payable").font(.subheadline.weight(.bold))

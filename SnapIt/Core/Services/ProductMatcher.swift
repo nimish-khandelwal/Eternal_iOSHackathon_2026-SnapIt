@@ -35,27 +35,49 @@ struct ProductMatcher {
         }
     }
 
-    /// A ranked shortlist for manual correction — used wherever `match(_:)` came
-    /// back nil or under-confident, so the user can pick the right SKU instead of
-    /// trusting a single silent guess.
+    /// A ranked shortlist for manual selection — every screen shows this
+    /// instead of silently committing to a single guess. When nothing in the
+    /// catalog is even a loose textual fit, falls back to the vision model's
+    /// own `suggestedCategory` rather than an arbitrary slice of the catalog.
     func candidates(for detected: DetectedProduct, limit: Int = 10) -> [Product] {
         let needle = normalize(detected.name)
         let needleTokens = tokens(of: needle)
 
-        guard !needleTokens.isEmpty else {
-            return Array(catalog.prefix(limit))
+        if !needleTokens.isEmpty {
+            let scored: [(product: Product, score: Int)] = catalog.compactMap { product in
+                let haystack = haystackString(for: product)
+                let score = overlapScore(product, needleTokens)
+                let looseMatch = score > 0 || haystack.contains(needle) || needle.contains(normalize(product.name))
+                guard looseMatch else { return nil }
+                return (product, score)
+            }
+
+            let ranked = scored.sorted { $0.score > $1.score }.map(\.product)
+            if !ranked.isEmpty {
+                return Array(ranked.prefix(limit))
+            }
         }
 
-        let scored: [(product: Product, score: Int)] = catalog.compactMap { product in
-            let haystack = haystackString(for: product)
-            let score = overlapScore(product, needleTokens)
-            let looseMatch = score > 0 || haystack.contains(needle) || needle.contains(normalize(product.name))
-            guard looseMatch else { return nil }
-            return (product, score)
-        }
+        return categoryFallback(for: detected.suggestedCategory, limit: limit)
+    }
 
-        let ranked = scored.sorted { $0.score > $1.score }.map(\.product)
-        return ranked.isEmpty ? Array(catalog.prefix(limit)) : Array(ranked.prefix(limit))
+    /// Nothing matched by name — fall back to products from the model's guessed
+    /// category (fuzzy-matched against real category names) so the picker shows
+    /// "other vegetables" instead of a random slice of the whole catalog.
+    private func categoryFallback(for suggestedCategory: String?, limit: Int) -> [Product] {
+        guard let suggestedCategory else { return Array(catalog.prefix(limit)) }
+        let needle = normalize(suggestedCategory)
+        guard !needle.isEmpty else { return Array(catalog.prefix(limit)) }
+
+        let realCategories = Set(catalog.map(\.category))
+        let matchedCategory = realCategories.first { normalize($0) == needle }
+            ?? realCategories.first { category in
+                let normalizedCategory = normalize(category)
+                return normalizedCategory.contains(needle) || needle.contains(normalizedCategory)
+            }
+
+        guard let matchedCategory else { return Array(catalog.prefix(limit)) }
+        return Array(catalog.filter { $0.category == matchedCategory }.prefix(limit))
     }
 
     private func overlapScore(_ product: Product, _ needleTokens: Set<String>) -> Int {

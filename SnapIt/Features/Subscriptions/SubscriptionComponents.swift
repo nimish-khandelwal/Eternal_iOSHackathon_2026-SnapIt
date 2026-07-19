@@ -5,7 +5,7 @@ struct SubscriptionStatusPill: View {
 
     private var tint: Color {
         switch status {
-        case .active: return .green
+        case .active: return .accent
         case .paused: return .orange
         case .stopped: return .gray
         case .finished: return .blue

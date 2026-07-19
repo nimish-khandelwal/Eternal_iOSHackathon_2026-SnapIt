@@ -48,7 +48,7 @@ struct SubscriptionsListView: View {
             }
             .foregroundStyle(.white)
             .padding(16)
-            .background(Color.green, in: RoundedRectangle(cornerRadius: 16))
+            .background(Color.accent, in: RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(.plain)
     }
@@ -154,7 +154,7 @@ private struct SubscriptionRow: View {
                 .foregroundStyle(.secondary)
 
             ProgressView(value: Double(subscription.deliveriesCompleted), total: Double(subscription.totalDeliveries))
-                .tint(.green)
+                .tint(.accent)
 
             Text("\(subscription.deliveriesCompleted) of \(subscription.totalDeliveries) deliveries")
                 .font(.caption2)
