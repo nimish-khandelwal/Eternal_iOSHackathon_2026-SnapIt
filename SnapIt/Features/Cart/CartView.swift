@@ -134,11 +134,10 @@ struct CartView: View {
                             .disabled(isProcessingPayment)
                             
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.top, 12)
-                        .padding(.bottom, 8)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background(Color(.systemBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 18))
-                        .background(.white)
                     }
                     .padding()
                 }
