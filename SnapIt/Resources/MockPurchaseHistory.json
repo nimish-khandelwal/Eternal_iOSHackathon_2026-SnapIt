@@ -1,0 +1,9 @@
+[
+  { "productId": "amul-milk-3677", "averageFrequencyDays": 4, "daysSinceLastOrder": 8 },
+  { "productId": "amul-butter-4465", "averageFrequencyDays": 12, "daysSinceLastOrder": 9 },
+  { "productId": "patanjali-toothpaste-2493", "averageFrequencyDays": 20, "daysSinceLastOrder": 29 },
+  { "productId": "mother-dairy-toor-dal-1890", "averageFrequencyDays": 5, "daysSinceLastOrder": 4 },
+  { "productId": "amul-paratha-1833", "averageFrequencyDays": 3, "daysSinceLastOrder": 5 },
+  { "productId": "aashirvaad-onion-1946", "averageFrequencyDays": 7, "daysSinceLastOrder": 5 },
+  { "productId": "aashirvaad-cola-3841", "averageFrequencyDays": 6, "daysSinceLastOrder": 10 }
+]

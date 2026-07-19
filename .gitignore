@@ -1,0 +1,9 @@
+.DS_Store
+xcuserdata/
+*.xcuserstate
+DerivedData/
+.swiftpm/
+
+# Never commit real API keys
+SnapIt/Core/Networking/Secrets.swift
+SnapIt/Core/Services/Secrets.swift
