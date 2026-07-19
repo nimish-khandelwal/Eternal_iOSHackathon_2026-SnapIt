@@ -59,11 +59,6 @@ struct ProductRow<Trailing: View>: View {
             trailing
         }
         .padding(12)
-        .alert("Running low soon?", isPresented: $isShowingRecommendationInfo) {
-            Button("Got it", role: .cancel) {}
-        } message: {
-            Text("You usually order \(recommendedQuantity ?? 0) × \(product.name) — right now you've added \(cartQuantity ?? 0). Topping up to your usual amount means fewer reorders later.")
-        }
     }
 }
 

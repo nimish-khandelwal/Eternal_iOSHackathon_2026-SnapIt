@@ -283,7 +283,7 @@ struct QuantityControl: View {
             }
             .foregroundStyle(.white)
             .frame(width: 84, height: 34)
-            .background(item.quantity >= (item.product.recommendedQuantity(using: appState.localOrders) ?? 0) ? Color.green : Color.orange)
+            .background(.green)
             .clipShape(Capsule())
             .animation(.easeInOut(duration: 0.18), value: item.quantity)
 

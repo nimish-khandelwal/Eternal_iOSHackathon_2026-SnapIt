@@ -10,6 +10,7 @@ struct CategoryDetailView: View {
 
     @State private var allProducts: [Product] = []
     @State private var selectedRailIndex = 0
+    @State private var selectedProduct: Product?
 
     private let gridColumns = [
         GridItem(.flexible(), spacing: 12),
@@ -38,6 +39,18 @@ struct CategoryDetailView: View {
         .animation(.spring(response: 0.32, dampingFraction: 0.86), value: appState.cartStore.totalCount)
         .task {
             allProducts = (try? await appState.catalogService.allProducts()) ?? []
+        }
+        .sheet(item: $selectedProduct) { product in
+            ProductOptionsSheet(
+                product: product,
+                onSelect: { selected in
+                    appState.cartStore.add([selected])
+                    selectedProduct = nil
+                }
+            )
+            .presentationDetents([.large])
+            .presentationCornerRadius(28)
+            .presentationDragIndicator(.hidden)
         }
     }
 
@@ -144,9 +157,20 @@ struct CategoryDetailView: View {
 
                 LazyVGrid(columns: gridColumns, spacing: 10) {
                     ForEach(visibleProducts) { product in
-                        BlinkitProductCard(product: product) {
-                            appState.cartStore.add([product])
-                        }
+                        BlinkitProductCard(
+                            product: product,
+                            quantityInCart: appState.cartStore.quantity(for: product),
+                            onIncrement: {
+                                if product.recommendedQuantity(using: appState.localOrders) ?? 0 > 1 {
+                                    selectedProduct = product        // show bottom sheet
+                                } else {
+                                    appState.cartStore.add([product])
+                                }
+                            },
+                            onDecrement: {
+                                appState.cartStore.decrement(product)
+                            }
+                        )
                     }
                 }
                 .padding(.horizontal, 12)
@@ -160,13 +184,13 @@ struct CategoryDetailView: View {
     private var promoBanner: some View {
         HStack(spacing: 8) {
             VStack(alignment: .leading, spacing: 5) {
-                Text("Fresh seasonal picks")
+                Text("Best picks")
                     .font(.system(size: 18, weight: .black, design: .rounded))
                     .foregroundStyle(.black)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
 
-                Text("Nutritional goodness in every bite")
+                Text("Only best options available for you")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.black.opacity(0.85))
             }
@@ -277,9 +301,12 @@ private struct RailItem: View {
 
 private struct BlinkitProductCard: View {
     let product: Product
-    let onAdd: () -> Void
+    let quantityInCart: Int
+    let onIncrement: () -> Void
+    let onDecrement: () -> Void
 
     @State private var isFavorite = false
+    @Environment(AppState.self) private var appState
 
     private var mrp: Double {
         product.mrp ?? (product.price * 1.2)
@@ -345,9 +372,9 @@ private struct BlinkitProductCard: View {
                             .frame(width: 5, height: 5)
                     }
                 }
-                .padding(.bottom, 34)
+                .padding(.bottom, 50)
             }
-
+            
             HStack(alignment: .bottom) {
                 VStack(alignment: .leading, spacing: 1) {
                     Text(product.unit)
@@ -355,27 +382,17 @@ private struct BlinkitProductCard: View {
                         .foregroundStyle(.black)
                 }
                 .padding(.leading, 10)
-                .padding(.bottom, 10)
+                .padding(.bottom, 14)
 
                 Spacer()
 
-                Button(action: onAdd) {
-                    Text("ADD")
-                        .font(.system(size: 13.5, weight: .black, design: .rounded))
-                        .foregroundStyle(Color(red: 0.20, green: 0.53, blue: 0.15))
-                        .frame(width: 64, height: 32)
-                        .background(Color.white, in: RoundedRectangle(cornerRadius: 10))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color(red: 0.20, green: 0.53, blue: 0.15), lineWidth: 1.5)
-                        }
-                        .shadow(color: .black.opacity(0.08), radius: 5, y: 2)
-                }
-                .buttonStyle(.plain)
-                .offset(x: -4, y: 8)
+                addControl
+                    .padding(.trailing, 6)
+                    .padding(.bottom, 8)
             }
         }
         .frame(height: 168)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
         .overlay(alignment: .topTrailing) {
             Button {
                 isFavorite.toggle()
@@ -386,6 +403,71 @@ private struct BlinkitProductCard: View {
             }
             .buttonStyle(.plain)
             .padding(9)
+        }
+    }
+
+    private static let brandGreen = Color(red: 0.20, green: 0.53, blue: 0.15)
+
+    @ViewBuilder
+    private var addControl: some View {
+        if quantityInCart == 0 {
+            Button(action: onIncrement) {
+                VStack(spacing: 0) {
+                    
+                    let showOptions = product.recommendedQuantity(using: appState.localOrders) ?? 0 > 1
+                    
+                    // Top button
+                    Text("ADD")
+                        .font(.system(size: 13.5, weight: .black, design: .rounded))
+                        .foregroundStyle(Self.brandGreen)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: showOptions ? 22 : 32)
+                        .background(Color.white)
+                    
+                    // Bottom options bar
+                    if showOptions {
+                        Text("2 options")
+                            .font(.system(size: 6, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 10)
+                            .background(Self.brandGreen)
+                    }
+                }
+                .frame(width: 64)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Self.brandGreen, lineWidth: 1.5)
+                )
+                .shadow(color: .black.opacity(0.08), radius: 5, y: 2)
+            }
+            .buttonStyle(.plain)
+        } else {
+            HStack(spacing: 0) {
+                Button(action: onDecrement) {
+                    Image(systemName: "minus")
+                        .font(.system(size: 12, weight: .bold))
+                        .frame(width: 22, height: 32)
+                        .contentShape(Rectangle())
+                }
+
+                Text("\(quantityInCart)")
+                    .font(.system(size: 13, weight: .black, design: .rounded))
+                    .frame(width: 20)
+
+                Button(action: onIncrement) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 12, weight: .bold))
+                        .frame(width: 22, height: 32)
+                        .contentShape(Rectangle())
+                }
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.white)
+            .frame(width: 64, height: 32)
+            .background(Self.brandGreen, in: RoundedRectangle(cornerRadius: 10))
+            .shadow(color: .black.opacity(0.12), radius: 5, y: 2)
         }
     }
 }
