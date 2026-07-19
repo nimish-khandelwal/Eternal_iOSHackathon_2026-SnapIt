@@ -48,9 +48,6 @@ struct CategoryDetailView: View {
                     selectedProduct = nil
                 }
             )
-            .presentationDetents([.large])
-            .presentationCornerRadius(28)
-            .presentationDragIndicator(.hidden)
         }
     }
 
