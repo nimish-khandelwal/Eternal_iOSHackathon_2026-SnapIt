@@ -36,12 +36,18 @@ enum VisionPrompt {
     (copy one of these strings exactly, do not invent your own):
     \(categoryList)
 
+    For every item, also set "low_stock": true if it visually looks nearly empty or nearly
+    finished — a bottle/carton with very little left, a jar mostly scraped out, only one or
+    two units where a fuller stock would normally sit. Set it false if the item looks
+    reasonably full or you can't tell. Only flag it true when the visual evidence is clear;
+    when in doubt, false.
+
     Ignore: utensils, cookware, appliances, furniture, people, hands, decorations.
 
     Return ONLY this JSON, no prose:
     {
       "detected_products": [
-        { "name": "Milk", "confidence": 0.93, "quantity_estimate": 1, "category": "Dairy" }
+        { "name": "Milk", "confidence": 0.93, "quantity_estimate": 1, "category": "Dairy", "low_stock": false }
       ]
     }
 

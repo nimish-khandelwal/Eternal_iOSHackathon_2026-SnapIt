@@ -27,7 +27,10 @@ final class PantryScanViewModel {
 
     var likelyRunningLow: [PantryComparisonResult] { results.filter { $0.status == .likelyRunningLow } }
     var stillAvailable: [PantryComparisonResult] { results.filter { $0.status == .stillAvailable } }
-    var notDetected: [PantryComparisonResult] { results.filter { $0.status == .notDetected } }
+    var outOfStock: [PantryComparisonResult] { results.filter { $0.status == .outOfStock } }
+
+    /// Everything worth adding to the cart — genuinely missing or visibly low.
+    var addableResults: [PantryComparisonResult] { likelyRunningLow + outOfStock }
 
     /// Unmatched detections — nothing in the catalog was even a loose fit.
     var unrecognizedDetections: [UncertainDetection] {

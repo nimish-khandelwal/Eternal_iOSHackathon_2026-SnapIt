@@ -9,7 +9,7 @@ final class MockVisionService: VisionService {
         switch mode {
         case .pantryScan:
             return [
-                DetectedProduct(name: "Amul Butter", confidence: 0.89, suggestedCategory: "Dairy"),
+                DetectedProduct(name: "Amul Butter", confidence: 0.89, suggestedCategory: "Dairy", isLowStock: true), // nearly empty tub
                 DetectedProduct(name: "Onions", confidence: 0.82, suggestedCategory: "Vegetables"),
                 // Not in the generated catalog at all — demonstrates the
                 // category fallback: no product matches "coriander", but the

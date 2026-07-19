@@ -10,6 +10,10 @@ struct DetectedProduct: Identifiable {
     /// in the prompt) — used to ground the manual-pick shortlist in something
     /// sensible when nothing in the catalog matches the name at all.
     var suggestedCategory: String?
+    /// Pantry Scan only — the model's visual read on whether this item looks
+    /// nearly empty/low quantity. Drives "Likely Running Low" directly, with
+    /// no fallback inference: if nothing is flagged, that section is empty.
+    var isLowStock: Bool
     var matchedProduct: Product?
 
     init(
@@ -17,6 +21,7 @@ struct DetectedProduct: Identifiable {
         confidence: Double,
         quantityEstimate: Int? = nil,
         suggestedCategory: String? = nil,
+        isLowStock: Bool = false,
         matchedProduct: Product? = nil
     ) {
         self.id = UUID()
@@ -24,6 +29,7 @@ struct DetectedProduct: Identifiable {
         self.confidence = confidence
         self.quantityEstimate = quantityEstimate
         self.suggestedCategory = suggestedCategory
+        self.isLowStock = isLowStock
         self.matchedProduct = matchedProduct
     }
 }
@@ -33,6 +39,7 @@ extension DetectedProduct: Decodable {
         case name, confidence
         case quantityEstimate = "quantity_estimate"
         case suggestedCategory = "category"
+        case isLowStock = "low_stock"
     }
 
     init(from decoder: Decoder) throws {
@@ -41,7 +48,8 @@ extension DetectedProduct: Decodable {
             name: try container.decode(String.self, forKey: .name),
             confidence: try container.decode(Double.self, forKey: .confidence),
             quantityEstimate: try container.decodeIfPresent(Int.self, forKey: .quantityEstimate),
-            suggestedCategory: try container.decodeIfPresent(String.self, forKey: .suggestedCategory)
+            suggestedCategory: try container.decodeIfPresent(String.self, forKey: .suggestedCategory),
+            isLowStock: try container.decodeIfPresent(Bool.self, forKey: .isLowStock) ?? false
         )
     }
 }

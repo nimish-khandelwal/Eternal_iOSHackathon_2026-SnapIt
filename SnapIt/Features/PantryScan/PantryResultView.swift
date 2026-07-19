@@ -4,8 +4,6 @@ struct PantryResultView: View {
     @Environment(AppState.self) private var appState
     var viewModel: PantryScanViewModel
 
-    @State private var showNotDetected = false
-
     var body: some View {
         VStack(spacing: 0) {
             ScrollView {
@@ -14,12 +12,12 @@ struct PantryResultView: View {
                         resultSection(title: "Likely Running Low", results: viewModel.likelyRunningLow)
                     }
 
-                    if !viewModel.stillAvailable.isEmpty {
-                        resultSection(title: "Still Available", results: viewModel.stillAvailable)
+                    if !viewModel.outOfStock.isEmpty {
+                        resultSection(title: "Out of Stock", results: viewModel.outOfStock)
                     }
 
-                    if !viewModel.notDetected.isEmpty {
-                        notDetectedSection
+                    if !viewModel.stillAvailable.isEmpty {
+                        resultSection(title: "Still Available", results: viewModel.stillAvailable)
                     }
 
                     if !viewModel.unrecognizedDetections.isEmpty {
@@ -31,11 +29,11 @@ struct PantryResultView: View {
             .background(Color(.systemGroupedBackground))
 
             AddToCartButton(
-                title: "Add Missing Items (\(viewModel.likelyRunningLow.count))",
+                title: "Add Missing Items (\(viewModel.addableResults.count))",
                 systemImage: "cart.badge.plus",
-                isDisabled: viewModel.likelyRunningLow.isEmpty
+                isDisabled: viewModel.addableResults.isEmpty
             ) {
-                appState.cartStore.add(viewModel.likelyRunningLow.map(\.product))
+                appState.cartStore.add(viewModel.addableResults.map(\.product))
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
@@ -70,43 +68,6 @@ struct PantryResultView: View {
             .overlay {
                 RoundedRectangle(cornerRadius: 18)
                     .stroke(.gray.opacity(0.08))
-            }
-        }
-    }
-
-    private var notDetectedSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Button {
-                withAnimation { showNotDetected.toggle() }
-            } label: {
-                HStack {
-                    sectionHeader("Not Detected (\(viewModel.notDetected.count))")
-                    Spacer()
-                    Image(systemName: showNotDetected ? "chevron.up" : "chevron.down")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .buttonStyle(.plain)
-
-            if showNotDetected {
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(viewModel.notDetected) { result in
-                        ProductRow(product: result.product, subtitle: subtitle(for: result)) {
-                            StatusPill(status: result.status)
-                        }
-                        if result.id != viewModel.notDetected.last?.id {
-                            Divider().padding(.leading, 12)
-                        }
-                    }
-                }
-                .padding(12)
-                .background(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 18))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 18)
-                        .stroke(.gray.opacity(0.08))
-                }
             }
         }
     }
@@ -160,18 +121,18 @@ struct PantryResultView: View {
     private func subtitle(for result: PantryComparisonResult) -> String {
         switch result.status {
         case .likelyRunningLow:
-            if let days = result.daysSinceLastOrder, let usual = result.usualFrequencyDays {
-                return "last ordered \(days)d ago · usually every \(usual)d"
+            if let confidence = result.detectionConfidence {
+                return "detected · looks low · \(Int(confidence * 100))% confidence"
             }
-            return "usually in your cart"
+            return "detected · looks low"
         case .stillAvailable:
             if let confidence = result.detectionConfidence {
                 return "detected · \(Int(confidence * 100))% confidence"
             }
             return "detected in frame"
-        case .notDetected:
+        case .outOfStock:
             if let days = result.daysSinceLastOrder {
-                return "last ordered \(days)d ago"
+                return "not seen this scan · last ordered \(days)d ago"
             }
             return "not seen this scan"
         }

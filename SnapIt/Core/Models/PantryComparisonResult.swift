@@ -1,11 +1,12 @@
 import Foundation
 
-/// Never "out of stock" — a single frame can't see the whole fridge, so the
-/// worst thing `ComparisonEngine` will say is that a refill is likely due.
 enum RefillStatus: String {
+    /// Detected in the photo AND the vision model flagged it as visually low/nearly empty.
     case likelyRunningLow = "Likely Running Low"
+    /// Detected in the photo, no low-stock signal.
     case stillAvailable = "Still Available"
-    case notDetected = "Not Detected"
+    /// Not detected in the photo at all — this frequent product simply didn't show up.
+    case outOfStock = "Out of Stock"
 }
 
 struct PantryComparisonResult: Identifiable {

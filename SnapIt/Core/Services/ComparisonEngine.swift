@@ -1,7 +1,10 @@
 import Foundation
 
-/// The feature's actual insight: frequent purchases minus what's visible this scan,
-/// biased by whether a product is already overdue for its usual reorder cadence.
+/// The feature's actual insight: frequent purchases against what's visible this
+/// scan. Status comes straight from the vision model's own read on each frame —
+/// no inference from order-history dates. Not detected at all → Out of Stock.
+/// Detected but flagged as visually low → Likely Running Low. Otherwise → Still
+/// Available.
 struct ComparisonEngine {
     func compare(frequent: [PurchaseHistoryEntry], detected: [DetectedProduct], today: Date) -> [PantryComparisonResult] {
         let detectedByProductID = Dictionary(
@@ -16,10 +19,14 @@ struct ComparisonEngine {
             let daysSince = Calendar.current.dateComponents(
                 [.day], from: entry.lastOrderedDate, to: today
             ).day ?? 0
-            let isOverdue = daysSince >= entry.averageFrequencyDays
             let seen = detectedByProductID[entry.product.id]
 
-            let status: RefillStatus = seen != nil ? .stillAvailable : (isOverdue ? .likelyRunningLow : .notDetected)
+            let status: RefillStatus
+            if let seen {
+                status = seen.isLowStock ? .likelyRunningLow : .stillAvailable
+            } else {
+                status = .outOfStock
+            }
 
             return PantryComparisonResult(
                 product: entry.product,
@@ -36,8 +43,8 @@ struct ComparisonEngine {
     private func statusOrder(_ status: RefillStatus) -> Int {
         switch status {
         case .likelyRunningLow: return 0
-        case .stillAvailable: return 1
-        case .notDetected: return 2
+        case .outOfStock: return 1
+        case .stillAvailable: return 2
         }
     }
 }
