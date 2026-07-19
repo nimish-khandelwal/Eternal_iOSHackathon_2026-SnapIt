@@ -7,6 +7,13 @@ An AI camera lens for Blinkit, built during the **Eternal iOS Hackathon 2026**
 (Blinkit track). Point your camera at a product, a shopping list, or your
 fridge — skip typing into a search bar entirely.
 
+## Team
+
+**Async Legion**
+
+- Prince — [built.by.prince@gmail.com](mailto:built.by.prince@gmail.com)
+- Nimish — [nimishkhandelwal2503@gmail.com](mailto:nimishkhandelwal2503@gmail.com)
+
 ## Features
 
 - **Snap Product** — point at any item, packaged or loose, and add it to
