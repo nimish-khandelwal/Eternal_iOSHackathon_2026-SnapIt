@@ -49,10 +49,10 @@ Camera photo ──▶ Vision AI (Gemini) ──▶ text guesses ("coke bottle")
 Screen recordings of each feature, in [`Screen Recordings/`](<Screen Recordings>):
 
 - 📷 [Snap Product](<Screen Recordings/Snap Product.mp4>)
-- 📝 [Shopping List](<Screen Recordings/Shopping List.mov>)
-- 🧊 [Pantry Scan](<Screen Recordings/Pantry Scan.mov>)
-- 🔁 [Recommended Quantity](<Screen Recordings/Recommended Quantity.MP4>)
-- 📦 [Subscriptions](<Screen Recordings/Subscriptions.MP4>)
+- 📝 [Shopping List](<Screen Recordings/Shopping List.mp4>)
+- 🧊 [Pantry Scan](<Screen Recordings/Pantry Scan.mp4>)
+- 🔁 [Recommended Quantity](<Screen Recordings/Recommended Quantity.mp4>)
+- 📦 [Subscriptions](<Screen Recordings/Subscriptions.mp4>)
 
 ## Tech stack
 
