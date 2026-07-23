@@ -7,7 +7,7 @@ SnapIt is a native iOS app made for **Blinkit**. Point your phone at a product, 
 Built by team **Async Legion** at the **Eternal iOS Hackathon 2026** (Blinkit track).
 
 > 🎥 **Demo videos** of every feature are in [`Screen Recordings/`](<Screen Recordings>):
-> 📷 [Snap Product](<Screen Recordings/Snap Product.mov>) · 📝 [Shopping List](<Screen Recordings/Shopping List.mov>) · 🧊 [Pantry Scan](<Screen Recordings/Pantry Scan.mov>) · 🔁 [Recommended Quantity](<Screen Recordings/Recommended Quantity.MP4>) · 📦 [Subscriptions](<Screen Recordings/Subscriptions.MP4>)
+> 📷 [Snap Product](<Screen Recordings/Snap Product.mp4>) · 📝 [Shopping List](<Screen Recordings/Shopping List.mov>) · 🧊 [Pantry Scan](<Screen Recordings/Pantry Scan.mov>) · 🔁 [Recommended Quantity](<Screen Recordings/Recommended Quantity.MP4>) · 📦 [Subscriptions](<Screen Recordings/Subscriptions.MP4>)
 
 ---
 
