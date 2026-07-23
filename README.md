@@ -38,11 +38,11 @@ Camera photo ──▶ Vision AI (Gemini) ──▶ text guesses ("coke bottle")
                              product options ──▶ you confirm ──▶ cart
 ```
 
-- **Vision layer** — one `VisionService` protocol with three swappable options: `GeminiVisionService` (default), `OpenAIVisionService` (GPT-4o), and `MockVisionService` (works offline — very handy when demo wifi fails). Changing the provider is a one-line change in `AppState`.
-- **ProductMatcher** — our own fuzzy matcher. It takes the AI's free text and finds the right catalog product using cleaned-up text and synonym matching. No embeddings, no network call. If the match score is below 0.75, the app treats it as a weak guess and pushes you to pick from the options.
-- **ComparisonEngine** — runs Pantry Scan: it checks what the camera saw against your past orders and builds the running-low / out-of-stock / available lists.
-- **LocalOrderHistoryStore** — your order history, saved only on your device. This powers Recommended Quantity. No account, no server.
-- **Mock catalog** — a 5,003-product JSON file plays the role of Blinkit's real product API. The whole app runs with no backend at all.
+- **Vision AI** — the part that looks at your photo. Default is **Gemini**. You can switch to **GPT-4o**, or to a **mock version** that works without internet (handy when demo wifi fails). Switching is one line in `AppState`.
+- **ProductMatcher** — the AI only returns text, like "coke bottle". This part finds the real catalog product that matches the text. If it is not sure, the app asks you to pick from a list instead of guessing.
+- **ComparisonEngine** — powers Pantry Scan. It compares what the camera saw with what you bought before, and tells you what is running low, out of stock, or still there.
+- **LocalOrderHistoryStore** — saves your order history on your phone only. This is how the app knows how much you usually buy. No account, no server.
+- **Mock catalog** — a JSON file with ~5,000 products. It acts as Blinkit's product API, so the app runs without any backend.
 
 ## Demo
 
