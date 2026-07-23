@@ -1,76 +1,89 @@
-# SnapIt
+# SnapIt 📸🛒
 
-**Point. Detect. Refill.**
-*Anything you can see becomes your Blinkit cart.*
+**Shop with your camera, not a search bar.**
 
-An AI camera lens for Blinkit, built during the **Eternal iOS Hackathon 2026**
-(Blinkit track). Point your camera at a product, a shopping list, or your
-fridge — skip typing into a search bar entirely.
+SnapIt is a native iOS prototype of an AI camera lens for **Blinkit**: point your phone at a product, a handwritten shopping list, or the inside of your fridge, and the app turns what it sees into a ready-to-confirm Blinkit cart. Built by team **Async Legion** for the **Eternal iOS Hackathon 2026** (Blinkit track).
+
+> 🎥 **Demo recordings** of every feature are in [`Screen Recordings/`](<Screen Recordings>):
+> 📷 [Snap Product](<Screen Recordings/Snap Product.mov>) · 📝 [Shopping List](<Screen Recordings/Shopping List.mov>) · 🧊 [Pantry Scan](<Screen Recordings/Pantry Scan.mov>) · 🔁 [Recommended Quantity](<Screen Recordings/Recommended Quantity.MP4>) · 📦 [Subscriptions](<Screen Recordings/Subscriptions.MP4>)
+
+---
+
+## The idea
+
+Typing "atta 5kg", "milk", "coriander" into a search bar is friction — especially when the thing you want is sitting right in front of you. SnapIt replaces that with three camera modes:
+
+| Mode | What you point at | What happens |
+|------|-------------------|--------------|
+| **Snap Product** | Any single item — packaged or loose | Recognized and matched to a catalog SKU in seconds |
+| **Shopping List** | A handwritten list or receipt | Every line is read, parsed, and matched to products |
+| **Pantry Scan** | Your fridge or shelf | Compared against your usual orders, then sorted into **Likely Running Low**, **Out of Stock**, and **Still Available** |
+
+Around the camera, it's a full shopping app: a browsable ~5,000-SKU catalog across 10 categories, a cart with checkout, and **subscriptions** for recurring orders (daily, weekly, monthly, or specific weekdays).
+
+Two principles drove the design:
+
+1. **The AI never acts silently.** Every recognition — confident or not — is shown as a row of candidate products you tap to confirm. A wrong guess is one tap to fix, never a surprise in your cart.
+2. **Learn from your own history.** The app tracks how much of each product you usually order (entirely on-device) and pre-fills that quantity the next time you add it — the **Recommended Quantity** feature.
+
+## How it works
+
+```
+Camera frame ──▶ Vision LLM (Gemini) ──▶ free-text guesses ("coke bottle")
+                                              │
+                                              ▼
+                                        ProductMatcher
+                              (normalization + synonym/token overlap)
+                                              │
+                                              ▼
+                              ranked catalog candidates ──▶ user confirms ──▶ cart
+```
+
+- **Vision layer** — a `VisionService` protocol with three interchangeable implementations: `GeminiVisionService` (default), `OpenAIVisionService` (GPT-4o drop-in), and `MockVisionService` (canned offline responses — a lifesaver when demo-venue wifi dies). Swapping providers is a one-line change in `AppState`.
+- **ProductMatcher** — a hand-rolled fuzzy matcher that bridges free-text model output to fixed catalog SKUs using normalized-string and synonym/token overlap. No embeddings, no network. Matches below a 0.75 confidence threshold are flagged as provisional so the UI can emphasize the candidate picker.
+- **ComparisonEngine** — powers Pantry Scan: diffs what the camera sees against your purchase history to produce the running-low / out-of-stock / available buckets.
+- **LocalOrderHistoryStore** — on-device order history that feeds Recommended Quantity. No account, no server.
+- **Mock catalog** — a 5,003-product JSON catalog stands in for Blinkit's real product API, so the whole app runs with zero backend.
+
+## Project layout
+
+```
+SnapIt/
+├── App/                AppState — dependency wiring, service selection
+├── Core/
+│   ├── Models/         Product, CartItem, Subscription, DetectedProduct, …
+│   └── Services/       VisionService (+ Gemini/OpenAI/Mock), ProductMatcher,
+│                       ComparisonEngine, CatalogService, LocalOrderHistoryStore
+├── Features/
+│   ├── Home/           Landing screen + voice search (SpeechRecognizer)
+│   ├── SnapProduct/    Single-item camera mode
+│   ├── ShoppingList/   List/receipt scanning
+│   ├── PantryScan/     Fridge scan + comparison results
+│   ├── Browse/         Searchable catalog grid
+│   ├── Cart/           Cart + checkout
+│   └── Subscriptions/  Recurring-order scheduling
+└── Resources/          MockCatalog.json, MockPurchaseHistory.json
+```
+
+100% **SwiftUI** with **AVFoundation** for live capture — no third-party dependencies.
+
+## Running it
+
+1. Open `SnapIt.xcodeproj` in Xcode 26.5+.
+2. Create `SnapIt/Core/Services/Secrets.swift` (gitignored, never committed):
+   ```swift
+   enum Secrets {
+       static let openAIAPIKey = ""
+       static let geminiAPIKey = ""
+   }
+   ```
+   A free Gemini key from [aistudio.google.com/apikey](https://aistudio.google.com/apikey) is enough.
+3. (Optional) Change the active provider in `SnapIt/App/AppState.swift` — `visionService` defaults to `GeminiVisionService()`; swap in `OpenAIVisionService()` or `MockVisionService()` to run fully offline.
+4. Build and run. Camera modes need a physical device; on the simulator, use the Photos-picker fallback.
 
 ## Team
 
-**Async Legion**
+**Async Legion** — Eternal iOS Hackathon 2026
 
-- Prince — [built.by.prince@gmail.com](mailto:built.by.prince@gmail.com)
-- Nimish — [nimishkhandelwal2503@gmail.com](mailto:nimishkhandelwal2503@gmail.com)
-
-## Features
-
-- **Snap Product** — point at any item, packaged or loose, and add it to
-  your cart in seconds.
-- **Shopping List** — photograph a handwritten list or a receipt; every line
-  gets read and matched.
-- **Pantry Scan** — photograph your fridge or shelf. The app compares what
-  it sees against what you usually buy and sorts everything into
-  **Likely Running Low**, **Out of Stock**, or **Still Available**.
-- **Browse Catalog** — a normal searchable product grid for when you're not
-  using the camera.
-- **Cart & Subscriptions** — checkout, plus recurring orders on a schedule
-  you set (daily, weekly, monthly, or specific days).
-- **Recommended Quantity** — the app remembers how much of each product you
-  usually order (from your own on-device order history) and suggests that
-  amount next time, right when you add it to your cart.
-
-Every AI guess — confident or not — is shown as a row of candidate products
-you tap to confirm. Nothing is ever added to the cart silently.
-
-## Demo
-
-Screen recordings of each feature, in [`Screen Recordings/`](<Screen Recordings>):
-
-- 📷 [Snap Product](<Screen Recordings/Snap Product.mov>)
-- 📝 [Shopping List](<Screen Recordings/Shopping List.mov>)
-- 🧊 [Pantry Scan](<Screen Recordings/Pantry Scan.mov>)
-- 🔁 [Recommended Quantity](<Screen Recordings/Recommended Quantity.MP4>)
-- 📦 [Subscriptions](<Screen Recordings/Subscriptions.MP4>)
-
-## Tech stack
-
-- **SwiftUI**, native iOS, no third-party UI framework
-- **AVFoundation** for the live camera capture
-- **Google Gemini Vision API** for product/text recognition (OpenAI GPT-4o
-  is a drop-in alternative — see [Setup](#setup))
-- A hand-rolled **product matcher** (fuzzy text matching + category
-  fallback) that turns free-text AI guesses into real catalog products
-- A mock ~5,000-SKU JSON catalog stands in for Blinkit's real product API —
-  no backend required to run this
-
-## Setup
-
-1. Open `SnapIt.xcodeproj` in Xcode 26.5+.
-2. Add your API key in `SnapIt/Core/Networking/Secrets.swift`:
-   ```swift
-   enum Secrets {
-       static let openAIAPIKey = "..."
-       static let geminiAPIKey = "..."
-   }
-   ```
-   This file is gitignored — it's never committed. Get a Gemini key at
-   [aistudio.google.com/apikey](https://aistudio.google.com/apikey) (no
-   billing setup required to start).
-3. In `SnapIt/App/AppState.swift`, `visionService` picks the active
-   provider — defaults to `GeminiVisionService()`. Swap in
-   `OpenAIVisionService()` or `MockVisionService()` (a canned offline
-   fallback, handy if wifi is unreliable mid-demo) on that one line.
-4. Build and run on a simulator or device. The camera modes need a real
-   device or the Photos-picker fallback (simulators have no camera).
+- **Nimish Khandelwal** — [nimishkhandelwal2503@gmail.com](mailto:nimishkhandelwal2503@gmail.com)
+- **Prince** — [built.by.prince@gmail.com](mailto:built.by.prince@gmail.com) · [team repo](https://github.com/XOPRINCEXO/Eternal_iOSHackathon_2026-SnapIt)
