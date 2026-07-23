@@ -6,9 +6,6 @@ SnapIt is a native iOS app made for **Blinkit**. Point your phone at a product, 
 
 Built by team **Async Legion** at the **Eternal iOS Hackathon 2026** (Blinkit track).
 
-> 🎥 **Demo videos** of every feature are in [`Screen Recordings/`](<Screen Recordings>):
-> 📷 [Snap Product](<Screen Recordings/Snap Product.mp4>) · 📝 [Shopping List](<Screen Recordings/Shopping List.mov>) · 🧊 [Pantry Scan](<Screen Recordings/Pantry Scan.mov>) · 🔁 [Recommended Quantity](<Screen Recordings/Recommended Quantity.MP4>) · 📦 [Subscriptions](<Screen Recordings/Subscriptions.MP4>)
-
 ---
 
 ## The idea
@@ -46,6 +43,27 @@ Camera photo ──▶ Vision AI (Gemini) ──▶ text guesses ("coke bottle")
 - **ComparisonEngine** — runs Pantry Scan: it checks what the camera saw against your past orders and builds the running-low / out-of-stock / available lists.
 - **LocalOrderHistoryStore** — your order history, saved only on your device. This powers Recommended Quantity. No account, no server.
 - **Mock catalog** — a 5,003-product JSON file plays the role of Blinkit's real product API. The whole app runs with no backend at all.
+
+## Demo
+
+Screen recordings of each feature, in [`Screen Recordings/`](<Screen Recordings>):
+
+- 📷 [Snap Product](<Screen Recordings/Snap Product.mp4>)
+- 📝 [Shopping List](<Screen Recordings/Shopping List.mov>)
+- 🧊 [Pantry Scan](<Screen Recordings/Pantry Scan.mov>)
+- 🔁 [Recommended Quantity](<Screen Recordings/Recommended Quantity.MP4>)
+- 📦 [Subscriptions](<Screen Recordings/Subscriptions.MP4>)
+
+## Tech stack
+
+- **SwiftUI**, native iOS, no third-party UI framework
+- **AVFoundation** for the live camera capture
+- **Google Gemini Vision API** for product/text recognition (OpenAI GPT-4o
+  is a drop-in alternative — see [Setup](#how-to-run))
+- A hand-rolled **product matcher** (fuzzy text matching + category
+  fallback) that turns free-text AI guesses into real catalog products
+- A mock ~5,000-SKU JSON catalog stands in for Blinkit's real product API —
+  no backend required to run this
 
 ## Project layout
 
