@@ -10,20 +10,20 @@ Built by team **Async Legion** at the **Eternal iOS Hackathon 2026** (Blinkit tr
 
 ## The idea
 
-Typing "atta 5kg", "milk", "coriander" into a search bar is slow — the thing you want is often right in front of you. So SnapIt gives you three camera modes:
+Why type "milk" or "atta 5kg" when the item is right in front of you? Just point your camera at it. SnapIt has three camera modes:
 
-| Mode | What you point at | What happens |
-|------|-------------------|--------------|
-| **Snap Product** | Any single item — packaged or loose | The app finds it in the catalog in seconds |
-| **Shopping List** | A handwritten list or a receipt | Every line is read and matched to products |
-| **Pantry Scan** | Your fridge or shelf | The app compares it with what you usually buy, and sorts items into **Likely Running Low**, **Out of Stock**, and **Still Available** |
+| Mode | Point your camera at | What the app does |
+|------|----------------------|-------------------|
+| **Snap Product** | Any one item | Finds it in the catalog |
+| **Shopping List** | A handwritten list or a receipt | Turns every line into a product |
+| **Pantry Scan** | Your fridge or shelf | Tells you what is **running low**, **out of stock**, or **still there** |
 
-Around the camera, it is a full shopping app: a searchable catalog of ~5,000 products in 10 categories, a cart with checkout, and **subscriptions** for repeat orders (daily, weekly, monthly, or on days you pick).
+Besides the camera, it is also a normal shopping app — browse ~5,000 products, add to cart, checkout, and set repeat orders with **subscriptions** (daily, weekly, monthly, or on days you pick).
 
-Two simple rules behind the design:
+Two simple rules:
 
-1. **The AI never adds anything on its own.** Every guess is shown as a row of matching products. You tap to confirm. A wrong guess takes one tap to fix — nothing lands in your cart silently.
-2. **The app learns from your own orders.** It remembers how much of each product you usually buy (all on your device) and suggests that amount next time — the **Recommended Quantity** feature.
+1. **The AI never adds items by itself.** It shows you matching options — you tap to confirm. A wrong guess is one tap to fix.
+2. **The app learns what you buy.** It remembers your usual quantity of each product and suggests it next time — the **Recommended Quantity** feature. All of this stays on your phone.
 
 ## How it works
 
